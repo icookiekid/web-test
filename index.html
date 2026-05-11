@@ -221,7 +221,7 @@
     margin-left: 0;
     margin-top: 70px;
     flex: 1;
-    padding: 40px 40px 80px;
+    padding: 40px;
   }
 
   .section {
@@ -710,45 +710,6 @@
     .posts-grid { grid-template-columns: 1fr; }
   }
 
-  /* ── DIARY ── */
-  .diary-key {
-    padding: 14px;
-    font-size: 20px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: white;
-    cursor: pointer;
-    font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.15s;
-    color: var(--text);
-  }
-  .diary-key:hover { background: rgba(212,129,111,0.08); color: var(--accent); }
-  .diary-key:active { transform: scale(0.95); background: var(--accent); color: white; }
-
-  .diary-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 24px;
-    cursor: pointer;
-    transition: all 0.25s;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .diary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    border-color: var(--accent2);
-  }
-  .diary-card-mood { font-size: 32px; flex-shrink: 0; }
-  .diary-card-body { flex: 1; min-width: 0; }
-  .diary-card-date { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
-  .diary-card-title { font-family: 'Noto Serif KR', serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .diary-card-preview { font-size: 13px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .diary-card-meta { font-size: 11px; color: #b0a89e; margin-top: 4px; }
-
   /* ════ MOBILE OPTIMIZATION ════ */
   @media (max-width: 1024px) {
     body {
@@ -880,9 +841,6 @@
         <button class="nav-subitem" onclick="navClick(this, 'memo'); closeAllFolders();">
           <span class="nav-icon">📝</span><span>메모</span>
         </button>
-        <button class="nav-subitem" onclick="openDiarySection(); closeAllFolders();">
-          <span class="nav-icon">📔</span><span>일기장</span>
-        </button>
       </div>
     </div>
 
@@ -906,7 +864,7 @@
               <span>v1 메뉴얼</span>
             </button>
             <button class="nav-subitem" onclick="navClick(this, 'v2docs'); closeAllFolders();" style="padding: 10px 16px 10px 56px; font-size: 12px;">
-              <span>v2 설명서</span>
+              <span>v2 메뉴얼 (준비중)</span>
             </button>
           </div>
         </div>
@@ -948,6 +906,25 @@
 
   </section>
 
+  <!-- 👥 방문자수 + 동기화 - 우측 하단 고정 -->
+  <div style="position:fixed; bottom:16px; right:16px; z-index:900; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+    <!-- 동기화 패널 (🔄 클릭 시 토글) -->
+    <div id="sync-panel" style="display:none; background:rgba(30,20,50,0.88); backdrop-filter:blur(8px); border-radius:10px; padding:8px; flex-direction:column; gap:5px;">
+      <button onclick="exportAllData()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📥 내보내기</button>
+      <button onclick="document.getElementById('import-all-file').click()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📤 불러오기</button>
+      <button onclick="saveToDrive()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">☁️ Drive 저장</button>
+      <input type="file" id="import-all-file" accept=".json,.zip" style="display:none;" onchange="importAllData(event)">
+    </div>
+    <!-- 하단 미니바 -->
+    <div style="background:rgba(30,20,50,0.75); backdrop-filter:blur(8px); border-radius:10px; padding:5px 10px; display:flex; align-items:center; gap:8px;">
+      <span style="font-size:11px; color:rgba(255,255,255,0.6);">👥</span>
+      <span style="font-size:11px; color:white; font-weight:600;" id="visitor-count">0</span>
+      <div style="width:1px; height:12px; background:rgba(255,255,255,0.2);"></div>
+      <button onclick="openAdminSection()" title="관리자" style="background:none; border:none; font-size:13px; cursor:pointer; padding:0; line-height:1;">⚙️</button>
+      <button onclick="(function(){var p=document.getElementById('sync-panel');p.style.display=p.style.display==='flex'?'none':'flex';})()" title="동기화" style="background:none; border:none; font-size:13px; cursor:pointer; padding:0; line-height:1;">🔄</button>
+    </div>
+  </div>
+
   <!-- 📚 문서 -->
   <section id="docs" class="section">
     <h1 class="section-title">📚 문서</h1>
@@ -968,10 +945,10 @@
         </div>
 
         <!-- v2 메뉴얼 카드 -->
-        <div onclick="navClick(null, 'v2docs')" style="background:linear-gradient(135deg,#0a0c10 0%,#111318 100%); border-radius:12px; padding:24px; color:white; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 32px rgba(0,212,255,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-          <div style="font-size:28px; margin-bottom:12px;">🚀</div>
-          <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">v2 설명서</h3>
-          <p style="font-size:13px; opacity:0.8;">키움 자동매매 완전 초보 가이드</p>
+        <div style="background:#f0f0f0; border-radius:12px; padding:24px; cursor:not-allowed; opacity:0.6; border:2px dashed #ddd;">
+          <div style="font-size:28px; margin-bottom:12px; opacity:0.5;">📋</div>
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:8px; color:#999;">v2 메뉴얼</h3>
+          <p style="font-size:13px; color:#999;">준비 중입니다</p>
         </div>
       </div>
     </div>
@@ -1247,810 +1224,14 @@
 
   <!-- V2 DOCS -->
   <section id="v2docs" class="section">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-      <div>
-        <h1 class="section-title" style="margin-bottom:4px;">🚀 키움 자동매매 설명서</h1>
-        <p class="section-desc" style="margin-bottom:0;">OpenAPI+ 설치부터 단타 우선 자동매매 가동까지 완전 초보 가이드</p>
-      </div>
-      <button onclick="navClick(null, 'docs')" style="background:#f5f3f0; border:1px solid var(--border); border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; font-family:inherit; color:var(--text-dim); white-space:nowrap;">← 문서로 돌아가기</button>
-    </div>
-    <div style="border-radius:12px; overflow:hidden; border:1px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,0.08);">
-      <iframe
-        srcdoc="<!DOCTYPE html>
-<html lang=&quot;ko&quot;>
-<head>
-<meta charset=&quot;UTF-8&quot;>
-<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
-<title>키움 자동매매 완전 정복 가이드</title>
-<link href=&quot;https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Bebas+Neue&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
-<style>
-:root {
-  --bg:#0a0c10; --bg2:#111318; --bg3:#181c24; --border:#232834;
-  --accent:#00d4ff; --accent2:#ff6b35; --accent3:#00ff9d;
-  --warn:#ffcc00; --danger:#ff4757;
-  --text:#e8eaf0; --text-dim:#7a8499;
-  --card-glow:0 0 40px rgba(0,212,255,0.06);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-
-/* hero */
-.hero{position:relative;overflow:hidden;padding:80px 40px 60px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,0.12) 0%,transparent 65%)}
-.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.04) 40px);pointer-events:none}
-.hero-badge{display:inline-block;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:4px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,7vw,80px);letter-spacing:4px;line-height:1;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:16px;color:var(--text-dim);max-width:560px;margin:0 auto 32px}
-.hero-meta{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
-.hero-meta span{font-size:13px;color:var(--text-dim)}
-.hero-meta b{color:var(--accent3)}
-
-/* layout */
-.container{max-width:960px;margin:0 auto;padding:0 24px}
-
-/* toc */
-.toc-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin:40px auto;max-width:960px;padding:0 24px}
-.toc-header{display:flex;align-items:center;gap:10px;padding:20px 0 16px;font-weight:700;font-size:15px;color:var(--accent);border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
-.toc-header .arrow{transition:transform 0.3s;font-size:10px}
-.toc-header.open .arrow{transform:rotate(180deg)}
-.toc-body{display:none;padding:16px 0 20px;columns:2;column-gap:32px}
-.toc-body.open{display:block}
-.toc-body a{display:flex;align-items:baseline;gap:8px;color:var(--text-dim);text-decoration:none;font-size:13px;padding:4px 0;transition:color 0.2s;break-inside:avoid}
-.toc-body a:hover{color:var(--accent)}
-.toc-body .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);min-width:28px}
-
-/* section */
-.section{padding:56px 0 16px;border-bottom:1px solid var(--border)}
-.section:last-of-type{border-bottom:none}
-.section-label{display:flex;align-items:center;gap:14px;margin-bottom:28px}
-.step-num{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#0087a8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;color:#000;flex-shrink:0;box-shadow:0 4px 20px rgba(0,212,255,0.3)}
-.step-num.warn{background:linear-gradient(135deg,var(--warn),#b89000)}
-.step-num.green{background:linear-gradient(135deg,var(--accent3),#00b86e)}
-.step-num.orange{background:linear-gradient(135deg,var(--accent2),#c44a18)}
-.section-label h2{font-size:22px;font-weight:700;color:#fff}
-.section-label h2 small{display:block;font-size:13px;font-weight:400;color:var(--text-dim);margin-top:2px}
-
-/* card */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px;box-shadow:var(--card-glow);transition:border-color 0.2s}
-.card:hover{border-color:rgba(0,212,255,0.25)}
-.card h3{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:12px}
-
-/* steps list */
-.steps{counter-reset:step;list-style:none}
-.steps li{counter-increment:step;display:flex;gap:16px;margin-bottom:18px;align-items:flex-start}
-.steps li::before{content:counter(step);width:28px;height:28px;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;margin-top:2px;font-family:'JetBrains Mono',monospace}
-.steps li strong{color:#fff}
-
-/* code */
-.code-block{background:#080a0e;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:18px 22px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:#c8d3e8;overflow-x:auto;position:relative;white-space:pre}
-.copy-btn{position:absolute;top:10px;right:12px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:background 0.2s}
-.copy-btn:hover{background:rgba(0,212,255,0.2)}
-.copy-btn.copied{color:var(--accent3);border-color:var(--accent3)}
-.cmd{color:var(--accent3)} .cmt{color:var(--text-dim)} .str{color:#ffb347} .kw{color:var(--accent)}
-
-/* callout */
-.callout{border-radius:10px;padding:16px 20px;margin:16px 0;display:flex;gap:14px;align-items:flex-start;font-size:14px}
-.callout .icon{font-size:20px;flex-shrink:0;margin-top:1px}
-.callout.tip{background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.2)}
-.callout.warn{background:rgba(255,204,0,0.07);border:1px solid rgba(255,204,0,0.25)}
-.callout.danger{background:rgba(255,71,87,0.07);border:1px solid rgba(255,71,87,0.25)}
-.callout.info{background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2)}
-
-/* table */
-.tbl-wrap{overflow-x:auto;margin:16px 0}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th{background:var(--bg3);color:var(--accent);font-weight:700;padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px}
-td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--text)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(0,212,255,0.03)}
-td code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,212,255,0.08);padding:1px 6px;border-radius:3px;color:var(--accent)}
-
-/* badge */
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-left:6px}
-.badge.required{background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3)}
-.badge.optional{background:rgba(0,255,157,0.1);color:var(--accent3);border:1px solid rgba(0,255,157,0.25)}
-.badge.note{background:rgba(255,204,0,0.1);color:var(--warn);border:1px solid rgba(255,204,0,0.3)}
-
-/* progress */
-.progress-bar-wrap{position:fixed;top:0;left:0;right:0;height:3px;z-index:999}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%;box-shadow:0 0 8px var(--accent)}
-
-/* fab */
-.fab{position:fixed;bottom:32px;right:32px;width:48px;height:48px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,212,255,0.4);z-index:99;font-size:20px;color:#000;text-decoration:none;transition:transform 0.2s}
-.fab:hover{transform:scale(1.1)}
-
-/* folder tree */
-.folder-tree{background:#080a0e;border:1px solid var(--border);border-radius:8px;padding:18px 22px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;white-space:pre}
-.folder-tree .dir{color:var(--accent)}
-.folder-tree .py{color:var(--accent3)}
-.folder-tree .txt{color:var(--text-dim)}
-
-/* config item */
-.config-item{display:grid;grid-template-columns:220px 1fr;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;font-size:13.5px}
-.config-key{background:var(--bg3);padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);border-right:1px solid var(--border)}
-.config-val{padding:12px 16px;color:var(--text)}
-.config-val .val{color:var(--accent3);font-family:'JetBrains Mono',monospace}
-
-/* flow */
-.flow{display:flex;align-items:stretch;margin:20px 0;overflow-x:auto;padding-bottom:4px}
-.flow-item{flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 12px;text-align:center;font-size:12px}
-.flow-item .fi-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:4px}
-.flow-item .fi-label{font-weight:700;color:#fff;font-size:13px}
-.flow-item .fi-sub{color:var(--text-dim);font-size:11px;margin-top:4px}
-.flow-arrow{display:flex;align-items:center;padding:0 6px;color:var(--accent);font-size:18px;flex-shrink:0}
-
-/* done banner */
-.done-banner{background:linear-gradient(135deg,rgba(0,255,157,0.08),rgba(0,212,255,0.08));border:1px solid rgba(0,255,157,0.2);border-radius:16px;padding:40px;text-align:center;margin:48px 0}
-.done-banner h2{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
-.done-banner p{color:var(--text-dim);font-size:14px;max-width:480px;margin:0 auto}
-
-/* checklist */
-.checklist{list-style:none}
-.checklist li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
-.checklist li:last-child{border-bottom:none}
-.cb{width:20px;height:20px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.cb.checked{background:var(--accent3);border-color:var(--accent3)}
-.cb.checked::after{content:'✓';color:#000;font-size:12px;font-weight:900}
-.checklist li.done .cb-text{text-decoration:line-through;color:var(--text-dim)}
-
-@media(max-width:640px){
-  .hero{padding:48px 20px 40px}
-  .toc-body{columns:1}
-  .flow{flex-direction:column}
-  .flow-arrow{transform:rotate(90deg);justify-content:center}
-  .config-item{grid-template-columns:1fr}
-  .config-key{border-right:none;border-bottom:1px solid var(--border)}
-}
-</style>
-</head>
-<body>
-
-<div class=&quot;progress-bar-wrap&quot;><div class=&quot;progress-bar&quot; id=&quot;pbar&quot;></div></div>
-
-<div class=&quot;hero&quot;>
-  <div class=&quot;hero-badge&quot;>Complete Beginner Guide</div>
-  <h1>키움 자동매매<br>완전 정복</h1>
-  <p class=&quot;hero-sub&quot;>OpenAPI+ 설치부터 단타 우선 자동매매 가동까지 — 한 번도 해본 적 없어도 따라할 수 있는 초보자 완전 가이드</p>
-  <div class=&quot;hero-meta&quot;>
-    <span>⏱ 소요시간 <b>약 2~3시간</b></span>
-    <span>💻 OS <b>Windows 10/11</b></span>
-    <span>💰 비용 <b>무료</b></span>
-  </div>
-</div>
-
-<div class=&quot;toc-wrap container&quot;>
-  <div class=&quot;toc-header&quot; onclick=&quot;toggleToc(this)&quot;>
-    📋 전체 목차 &amp;nbsp;<span class=&quot;arrow&quot;>▼</span>
-  </div>
-  <div class=&quot;toc-body&quot; id=&quot;tocBody&quot;>
-    <a href=&quot;#s0&quot;><span class=&quot;num&quot;>00</span>시작 전 준비물 확인</a>
-    <a href=&quot;#s1&quot;><span class=&quot;num&quot;>01</span>키움증권 계좌 개설</a>
-    <a href=&quot;#s2&quot;><span class=&quot;num&quot;>02</span>영웅문 HTS 설치</a>
-    <a href=&quot;#s3&quot;><span class=&quot;num&quot;>03</span>OpenAPI+ 신청 및 설치</a>
-    <a href=&quot;#s4&quot;><span class=&quot;num&quot;>04</span>Python 3.9 (32bit) 설치</a>
-    <a href=&quot;#s5&quot;><span class=&quot;num&quot;>05</span>필수 라이브러리 설치</a>
-    <a href=&quot;#s6&quot;><span class=&quot;num&quot;>06</span>조건검색식 등록 (영웅문)</a>
-    <a href=&quot;#s7&quot;><span class=&quot;num&quot;>07</span>코드 파일 배치</a>
-    <a href=&quot;#s8&quot;><span class=&quot;num&quot;>08</span>CONFIG 설정</a>
-    <a href=&quot;#s9&quot;><span class=&quot;num&quot;>09</span>첫 실행 &amp;amp; 로그인</a>
-    <a href=&quot;#s10&quot;><span class=&quot;num&quot;>10</span>실전 운용 체크리스트</a>
-    <a href=&quot;#s11&quot;><span class=&quot;num&quot;>11</span>자주 묻는 오류 해결</a>
-  </div>
-</div>
-
-<div class=&quot;container&quot;>
-
-<!-- S0 -->
-<div class=&quot;section&quot; id=&quot;s0&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num warn&quot;>00</div>
-    <h2>시작 전 준비물 확인 <small>이것만 있으면 됩니다</small></h2>
-  </div>
-  <div class=&quot;callout info&quot;>
-    <span class=&quot;icon&quot;>ℹ️</span>
-    <div>이 가이드는 <strong>키움 자동매매 표준판 v2.0 (단타 우선 수정본)</strong> 기준입니다. <code>v4_kiwoom_*.py</code> 파일을 미리 준비해두세요.</div>
-  </div>
-  <div class=&quot;tbl-wrap&quot;>
-    <table>
-      <tr><th>항목</th><th>필요 사항</th><th>비고</th></tr>
-      <tr><td>📱 신분증</td><td>주민등록증 또는 운전면허증</td><td><span class=&quot;badge required&quot;>REQUIRED</span></td></tr>
-      <tr><td>💳 은행계좌</td><td>본인 명의 입출금 통장</td><td><span class=&quot;badge required&quot;>REQUIRED</span></td></tr>
-      <tr><td>💻 PC / 노트북</td><td>Windows 10 또는 11 (64bit OS 가능)</td><td><span class=&quot;badge required&quot;>REQUIRED</span></td></tr>
-      <tr><td>🌐 인터넷</td><td>안정적인 유선 인터넷 권장</td><td><span class=&quot;badge note&quot;>RECOMMENDED</span></td></tr>
-      <tr><td>🐍 Python</td><td>3.9.x (32bit 전용) — 뒤에서 설치</td><td><span class=&quot;badge required&quot;>REQUIRED</span></td></tr>
-      <tr><td>📂 코드 파일</td><td>v4_kiwoom_*.py (수정 완료본)</td><td><span class=&quot;badge required&quot;>REQUIRED</span></td></tr>
-    </table>
-  </div>
-  <div class=&quot;callout danger&quot;>
-    <span class=&quot;icon&quot;>⚠️</span>
-    <div><strong>Windows 전용 — Mac/Linux 불가!</strong><br>키움 OpenAPI+는 Windows 전용 ActiveX 기반 프로그램입니다. Mac이나 Linux에서는 절대 실행되지 않습니다.</div>
-  </div>
-</div>
-
-<!-- S1 -->
-<div class=&quot;section&quot; id=&quot;s1&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>01</div>
-    <h2>키움증권 계좌 개설 <small>비대면으로 10분 완료</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📱 비대면 계좌 개설 순서</h3>
-    <ol class=&quot;steps&quot;>
-      <li><strong>키움증권 앱 설치</strong> — 구글 플레이 또는 앱 스토어에서 &quot;키움증권&quot; 검색 후 설치</li>
-      <li><strong>계좌 개설 선택</strong> — 앱 실행 → 하단 &quot;계좌 개설&quot; 탭 선택</li>
-      <li><strong>본인 인증</strong> — 주민등록번호 입력 → 휴대폰 또는 신분증 촬영으로 인증</li>
-      <li><strong>계좌 종류 선택</strong> — <em>종합위탁계좌</em> 선택 (주식 거래 전용)</li>
-      <li><strong>입금 확인</strong> — 연결 은행에서 최소 1만 원 이상 이체 후 계좌 활성화 확인</li>
-    </ol>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div>계좌번호는 <strong>10자리 숫자</strong>입니다. 나중에 CONFIG에 입력해야 하니 메모해두세요.</div>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🔑 모의투자 계좌 (처음이라면 강력 권장)</h3>
-    <ol class=&quot;steps&quot;>
-      <li>키움증권 홈페이지 접속 → 상단 메뉴 <strong>[트레이딩] → [모의투자]</strong></li>
-      <li>모의투자 신청 → 가상 금액 1억 원 지급</li>
-      <li>자동매매 코드를 <strong>최소 1~2주 모의투자로 테스트</strong>한 뒤 실전 전환 권장</li>
-    </ol>
-    <div class=&quot;callout warn&quot;>
-      <span class=&quot;icon&quot;>⚠️</span>
-      <div>모의투자 계좌번호와 실계좌 계좌번호는 <strong>다릅니다</strong>. CONFIG 파일에 정확히 입력해야 합니다.</div>
-    </div>
-  </div>
-</div>
-
-<!-- S2 -->
-<div class=&quot;section&quot; id=&quot;s2&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>02</div>
-    <h2>영웅문 HTS 설치 <small>키움증권 공식 거래 프로그램</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>💾 설치 순서</h3>
-    <ol class=&quot;steps&quot;>
-      <li>키움증권 홈페이지(<code>kiwoom.com</code>) 접속</li>
-      <li>상단 메뉴 <strong>[트레이딩] → [HTS(영웅문4)]</strong> 클릭</li>
-      <li><strong>&quot;영웅문4 다운로드&quot;</strong> 버튼 클릭 → 설치 파일 실행</li>
-      <li>설치 경로는 기본값 유지 권장 (<code>C:\eFriend Expert</code>)</li>
-      <li>설치 완료 후 바탕화면의 <strong>영웅문4 아이콘</strong>으로 실행</li>
-      <li>공인인증서 또는 아이디/비밀번호로 로그인 완료</li>
-    </ol>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div>영웅문 로그인 후 <strong>[0150] 화면(조건검색)</strong>이 열리면 정상 설치입니다. 이 화면은 6단계에서 사용합니다.</div>
-    </div>
-  </div>
-</div>
-
-<!-- S3 -->
-<div class=&quot;section&quot; id=&quot;s3&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>03</div>
-    <h2>OpenAPI+ 신청 및 설치 <small>자동매매의 핵심 모듈</small></h2>
-  </div>
-  <div class=&quot;callout info&quot;>
-    <span class=&quot;icon&quot;>ℹ️</span>
-    <div>OpenAPI+는 키움증권에서 제공하는 자동매매 전용 인터페이스입니다. 영웅문과 별도로 신청이 필요하며, <strong>무료</strong>입니다.</div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📋 신청 방법 (즉시 승인)</h3>
-    <ol class=&quot;steps&quot;>
-      <li>키움증권 홈페이지 접속 후 로그인</li>
-      <li>상단 메뉴 <strong>[트레이딩] → [키움 OpenAPI]</strong> 클릭</li>
-      <li><strong>&quot;사용 신청&quot;</strong> 버튼 클릭 → 약관 동의 → 즉시 완료</li>
-      <li>같은 페이지에서 <strong>&quot;KOA Studio 다운로드&quot;</strong> 클릭 후 설치 (개발 도구)</li>
-      <li>같은 페이지에서 <strong>&quot;OpenAPI+ 모듈 다운로드&quot;</strong> 클릭 후 설치</li>
-    </ol>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>✅ 설치 후 확인</h3>
-    <ol class=&quot;steps&quot;>
-      <li>시작 메뉴에서 <strong>&quot;KOA Studio&quot;</strong> 검색 후 실행</li>
-      <li>로그인 창에 키움 아이디/비밀번호 입력</li>
-      <li>좌측 트리에서 <strong>TR 목록</strong>이 보이면 OpenAPI 정상 설치 완료</li>
-    </ol>
-    <div class=&quot;callout warn&quot;>
-      <span class=&quot;icon&quot;>⚠️</span>
-      <div><strong>자동 업데이트 주의!</strong><br>OpenAPI+ 실행 시 업데이트 알림이 뜨면 반드시 <strong>업데이트를 진행</strong>하세요. 구버전은 연결이 안 될 수 있습니다.</div>
-    </div>
-  </div>
-</div>
-
-<!-- S4 -->
-<div class=&quot;section&quot; id=&quot;s4&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>04</div>
-    <h2>Python 3.9 (32bit) 설치 <small>반드시 32bit 버전!</small></h2>
-  </div>
-  <div class=&quot;callout danger&quot;>
-    <span class=&quot;icon&quot;>🚨</span>
-    <div><strong>64bit Python 사용 시 작동하지 않습니다!</strong><br>키움 OpenAPI+는 32bit(x86) 전용입니다. 일반적으로 설치되는 64bit Python과 <strong>완전히 별개로 32bit를 따로 설치</strong>해야 합니다.</div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🐍 Python 3.9.x 32bit 다운로드 및 설치</h3>
-    <ol class=&quot;steps&quot;>
-      <li>
-        브라우저에서 아래 주소 접속
-        <div class=&quot;code-block&quot; style=&quot;white-space:normal&quot;>https://www.python.org/downloads/release/python-3913/</div>
-      </li>
-      <li>
-        페이지 하단 <strong>Files</strong> 섹션에서 아래 파일 다운로드
-        <div class=&quot;code-block&quot;><span class=&quot;str&quot;>Windows installer (32-bit)</span>  ← 이 파일을 받으세요
-<span class=&quot;cmt&quot;>파일명 예: python-3.9.13.exe</span></div>
-      </li>
-      <li>다운로드된 <code>.exe</code> 실행</li>
-      <li>
-        첫 화면에서 <strong>반드시 체크!</strong>
-        <div class=&quot;code-block&quot;>☑  <span class=&quot;str&quot;>Add Python 3.9 to PATH</span>  ← 이거 꼭 체크!</div>
-      </li>
-      <li><strong>&quot;Install Now&quot;</strong> 클릭 → 완료까지 대기 (약 3~5분)</li>
-    </ol>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>✅ 설치 확인 방법</h3>
-    <p>설치 후 <strong>명령 프롬프트(cmd)</strong>를 열고 아래 명령어를 입력하세요.</p>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;cmd&quot;>python --version</span>
-<span class=&quot;cmt&quot;># 결과: Python 3.9.x  → 성공</span>
-
-<span class=&quot;cmd&quot;>python -c &quot;import struct; print(struct.calcsize('P')*8, 'bit')&quot;</span>
-<span class=&quot;cmt&quot;># 결과: 32 bit  → 반드시 32이어야 합니다!</span></div>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div><strong>cmd(명령 프롬프트) 여는 방법</strong><br>키보드 <kbd>Win</kbd> + <kbd>R</kbd> 동시에 누름 → <code>cmd</code> 입력 → 엔터</div>
-    </div>
-  </div>
-</div>
-
-<!-- S5 -->
-<div class=&quot;section&quot; id=&quot;s5&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>05</div>
-    <h2>필수 라이브러리 설치 <small>자동매매에 필요한 패키지 3종</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📦 명령 프롬프트(cmd)에서 순서대로 입력</h3>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;cmt&quot;># 1. pip 최신화</span>
-<span class=&quot;cmd&quot;>python -m pip install --upgrade pip</span>
-
-<span class=&quot;cmt&quot;># 2. 필수 라이브러리 설치 (버전 반드시 일치!)</span>
-<span class=&quot;cmd&quot;>pip install PyQt5==5.15.9 pandas==2.0.3 numpy==1.24.4</span>
-
-<span class=&quot;cmt&quot;># 3. 설치 확인</span>
-<span class=&quot;cmd&quot;>python -c &quot;import PyQt5, pandas, numpy; print('설치 완료 OK')&quot;</span></div>
-    <div class=&quot;tbl-wrap&quot; style=&quot;margin-top:16px&quot;>
-      <table>
-        <tr><th>라이브러리</th><th>버전</th><th>역할</th></tr>
-        <tr><td><code>PyQt5</code></td><td>5.15.9</td><td>GUI 화면 및 이벤트 루프 — 키움 API 연동 필수</td></tr>
-        <tr><td><code>pandas</code></td><td>2.0.3</td><td>주가 데이터 처리 (일봉/분봉 분석)</td></tr>
-        <tr><td><code>numpy</code></td><td>1.24.4</td><td>RSI, MACD 등 수치 계산</td></tr>
-      </table>
-    </div>
-    <div class=&quot;callout warn&quot;>
-      <span class=&quot;icon&quot;>⚠️</span>
-      <div>버전을 <strong>정확히</strong> 맞춰야 합니다. 최신 버전을 설치하면 32bit 호환 문제로 오류가 날 수 있습니다.</div>
-    </div>
-  </div>
-</div>
-
-<!-- S6 -->
-<div class=&quot;section&quot; id=&quot;s6&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num orange&quot;>06</div>
-    <h2>조건검색식 등록 (영웅문) <small>가장 중요한 단계 — 이름 정확히!</small></h2>
-  </div>
-  <div class=&quot;callout danger&quot;>
-    <span class=&quot;icon&quot;>🚨</span>
-    <div><strong>이름이 한 글자라도 다르면 작동하지 않습니다!</strong><br>코드에 설정된 조건검색식 이름과 영웅문에 저장된 이름이 <strong>완전히 동일</strong>해야 합니다.</div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📋 등록해야 할 조건검색식 목록</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>코드 내 KEY</th><th>영웅문 저장 이름 (정확히 입력)</th><th>전략</th><th>상태</th></tr>
-        <tr><td><code>scalp_momentum</code></td><td><strong>급등초입포착</strong></td><td>단타</td><td><span class=&quot;badge optional&quot;>활성</span></td></tr>
-        <tr><td><code>scalp_pullback</code></td><td><strong>눌림목반등</strong></td><td>단타</td><td><span class=&quot;badge optional&quot;>활성</span></td></tr>
-        <tr><td><code>swing_macd</code></td><td><strong>MACD골든크로스</strong></td><td>스윙</td><td><span class=&quot;badge optional&quot;>활성</span></td></tr>
-        <tr><td><code>swing_foreign</code></td><td><strong>외국인연속매수</strong></td><td>스윙</td><td><span class=&quot;badge optional&quot;>활성</span></td></tr>
-        <tr><td><code>scalp_surge</code></td><td><strong>급등모멘텀</strong></td><td>단타</td><td><span class=&quot;badge note&quot;>비활성(고위험)</span></td></tr>
-      </table>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🛠️ 영웅문에서 조건검색식 만드는 방법</h3>
-    <ol class=&quot;steps&quot;>
-      <li>영웅문 실행 및 로그인 → 화면 상단 검색창에 <strong>0150</strong> 입력 → 엔터 (조건검색 화면 오픈)</li>
-      <li>화면 좌측 하단 <strong>&quot;조건식 만들기&quot;</strong> 또는 <strong>&quot;+&quot;</strong> 버튼 클릭</li>
-      <li>
-        <strong>급등초입포착</strong> 예시 조건 설정:
-        <div class=&quot;code-block&quot;><span class=&quot;cmt&quot;># 추천 조건 조합 예시 (영웅문 조건 항목에서 선택)</span>
-거래량비율  ≥ 200%  (전일 대비 거래량 2배 이상)
-등락율      ≥ 2%    (당일 2% 이상 상승 중)
-시가총액    500억 ~ 5조 (적정 규모 종목)
-관리종목    제외
-거래정지    제외
-단기과열    제외</div>
-      </li>
-      <li>조건 설정 완료 후 이름 입력란에 <strong>&quot;급등초입포착&quot;</strong> 정확히 입력 → <strong>&quot;저장&quot;</strong></li>
-      <li>같은 방식으로 <strong>눌림목반등 / MACD골든크로스 / 외국인연속매수</strong> 순서대로 생성 및 저장</li>
-    </ol>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div>
-        <strong>조건식 만들기가 어렵다면?</strong><br>
-        영웅문 조건검색 화면 → <strong>[공유 조건식]</strong> 탭에서 다른 사용자가 공개한 조건식을 불러온 뒤, 이름만 위 표에 맞게 변경해도 됩니다. 키움증권 유튜브 채널에서 &quot;영웅문 조건검색 만들기&quot;를 검색하면 상세 영상 가이드도 있습니다.
-      </div>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>✅ 등록 확인</h3>
-    <ol class=&quot;steps&quot;>
-      <li>조건검색 화면 좌측 리스트에 저장한 이름 4개가 보이는지 확인</li>
-      <li>각 조건식 클릭 시 하단에 종목 목록이 표시되는지 확인</li>
-      <li>종목이 표시되면 조건식 정상 작동 중</li>
-    </ol>
-  </div>
-</div>
-
-<!-- S7 -->
-<div class=&quot;section&quot; id=&quot;s7&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num&quot;>07</div>
-    <h2>코드 파일 배치 <small>폴더 구조 만들기</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📁 권장 폴더 구조</h3>
-    <div class=&quot;folder-tree&quot;><span class=&quot;dir&quot;>C:\AutoTrader\</span>
-│
-├── <span class=&quot;py&quot;>v4_kiwoom_claude_ai_20260506_1551.py</span>      ← Claude AI 버전
-├── <span class=&quot;py&quot;>v4_kiwoom_openai_gpt_20260506_1551.py</span>     ← OpenAI GPT 버전
-├── <span class=&quot;py&quot;>v4_kiwoom_standard_20260506_1551.py</span>       ← 표준 버전
-│
-├── <span class=&quot;dir&quot;>logs\</span>                                     (자동 생성됨)
-└── <span class=&quot;dir&quot;>reports\</span>                                  (자동 생성됨)</div>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div><strong>폴더 만들기:</strong> 키보드 <kbd>Win</kbd>+<kbd>E</kbd> → C드라이브 빈 공간 우클릭 → 새 폴더 → 이름: <code>AutoTrader</code></div>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📂 파일 복사</h3>
-    <ol class=&quot;steps&quot;>
-      <li>다운로드된 <code>.py</code> 파일들을 <code>C:\AutoTrader\</code> 폴더에 복사 (드래그 앤 드롭)</li>
-      <li><code>logs</code>와 <code>reports</code> 폴더는 프로그램 첫 실행 시 <strong>자동으로 생성</strong>됩니다</li>
-      <li>파일 이름을 바꾸면 실행 명령어도 같이 바꿔야 합니다</li>
-    </ol>
-  </div>
-</div>
-
-<!-- S8 -->
-<div class=&quot;section&quot; id=&quot;s8&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num orange&quot;>08</div>
-    <h2>CONFIG 설정 <small>내 상황에 맞게 수정하는 핵심 설정</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📝 파일 열기</h3>
-    <ol class=&quot;steps&quot;>
-      <li><code>C:\AutoTrader\</code>에서 <code>.py</code> 파일 마우스 우클릭</li>
-      <li><strong>&quot;연결 프로그램&quot;</strong> → <strong>&quot;메모장&quot;</strong> 선택 (VS Code 있으면 더 좋음)</li>
-      <li><kbd>Ctrl</kbd> + <kbd>F</kbd> → <code>CONFIG = {</code> 검색 → 아래 항목 수정</li>
-    </ol>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>⚙️ 반드시 수정해야 할 항목</h3>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>account</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>&quot;1234567890&quot;</span> — 본인 계좌번호 10자리 (하이픈 없이). 모의투자는 모의 계좌번호</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>total_budget</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>10_000_000</span> — 자동매매에 투입할 전체 금액(원). 기본 1,000만원</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>max_stocks</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>5</span> — 단타+스윙 합산 최대 동시 보유 종목 수</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>scalp_max_stocks</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>3</span> — 단타 전용 슬롯. 스윙 = max_stocks - 이 값 (5-3=2슬롯)</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>scalp_budget_pct</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>0.15</span> — 단타 종목당 예산 비율 15%. 예: 1000만×0.15 = 150만원/종목</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>swing_budget_pct</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>0.20</span> — 스윙 종목당 예산 비율 20%. 예: 1000만×0.20 = 200만원/종목</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>scalp_tp / scalp_sl</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>0.025 / 0.015</span> — 단타 익절 +2.5% / 손절 -1.5%</div>
-    </div>
-    <div class=&quot;config-item&quot;>
-      <div class=&quot;config-key&quot;>daily_loss_limit</div>
-      <div class=&quot;config-val&quot;><span class=&quot;val&quot;>-0.03</span> — 하루 손실 한도 -3%. 초과 시 당일 매매 자동 중단</div>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>💡 초보자 추천 설정 (소액 테스트용)</h3>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;kw&quot;>CONFIG</span> = {
-    <span class=&quot;str&quot;>&quot;account&quot;</span>:           <span class=&quot;str&quot;>&quot;본인계좌번호10자리&quot;</span>,  <span class=&quot;cmt&quot;># ← 여기 꼭 수정</span>
-    <span class=&quot;str&quot;>&quot;max_stocks&quot;</span>:         3,         <span class=&quot;cmt&quot;># 처음엔 3종목으로 시작</span>
-    <span class=&quot;str&quot;>&quot;scalp_max_stocks&quot;</span>:   2,         <span class=&quot;cmt&quot;># 단타 2슬롯, 스윙 1슬롯</span>
-    <span class=&quot;str&quot;>&quot;total_budget&quot;</span>:        3_000_000, <span class=&quot;cmt&quot;># 300만원으로 테스트</span>
-    <span class=&quot;str&quot;>&quot;scalp_budget_pct&quot;</span>:   0.10,      <span class=&quot;cmt&quot;># 종목당 10% = 30만원</span>
-    <span class=&quot;str&quot;>&quot;swing_budget_pct&quot;</span>:   0.15,      <span class=&quot;cmt&quot;># 종목당 15% = 45만원</span>
-    <span class=&quot;str&quot;>&quot;scalp_tp&quot;</span>:            0.025,     <span class=&quot;cmt&quot;># 익절 +2.5%</span>
-    <span class=&quot;str&quot;>&quot;scalp_sl&quot;</span>:            0.015,     <span class=&quot;cmt&quot;># 손절 -1.5%</span>
-    <span class=&quot;str&quot;>&quot;daily_loss_limit&quot;</span>:   -0.02,     <span class=&quot;cmt&quot;># 하루 -2% 초과 시 중단</span>
-    <span class=&quot;cmt&quot;># 나머지는 기본값 유지</span>
-}</div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>📌 단타/스윙 슬롯 배분 참고표</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>max_stocks</th><th>scalp_max_stocks</th><th>단타 최대</th><th>스윙 최대</th><th>추천 대상</th></tr>
-        <tr><td>3</td><td>2</td><td>2종목</td><td>1종목</td><td>소액 테스트 초보자</td></tr>
-        <tr><td>5</td><td>3</td><td>3종목</td><td>2종목</td><td>기본 설정 (권장)</td></tr>
-        <tr><td>7</td><td>5</td><td>5종목</td><td>2종목</td><td>단타 집중 운용</td></tr>
-        <tr><td>10</td><td>7</td><td>7종목</td><td>3종목</td><td>고액 운용자</td></tr>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- S9 -->
-<div class=&quot;section&quot; id=&quot;s9&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num green&quot;>09</div>
-    <h2>첫 실행 &amp;amp; 로그인 <small>드디어 실행!</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🚀 실행 순서 (반드시 이 순서대로!)</h3>
-    <div class=&quot;flow&quot;>
-      <div class=&quot;flow-item&quot;>
-        <div class=&quot;fi-num&quot;>STEP 1</div>
-        <div class=&quot;fi-label&quot;>영웅문 실행</div>
-        <div class=&quot;fi-sub&quot;>로그인까지 완료</div>
-      </div>
-      <div class=&quot;flow-arrow&quot;>→</div>
-      <div class=&quot;flow-item&quot;>
-        <div class=&quot;fi-num&quot;>STEP 2</div>
-        <div class=&quot;fi-label&quot;>OpenAPI+ 확인</div>
-        <div class=&quot;fi-sub&quot;>트레이 아이콘 확인</div>
-      </div>
-      <div class=&quot;flow-arrow&quot;>→</div>
-      <div class=&quot;flow-item&quot;>
-        <div class=&quot;fi-num&quot;>STEP 3</div>
-        <div class=&quot;fi-label&quot;>cmd 실행</div>
-        <div class=&quot;fi-sub&quot;>관리자 권한 권장</div>
-      </div>
-      <div class=&quot;flow-arrow&quot;>→</div>
-      <div class=&quot;flow-item&quot;>
-        <div class=&quot;fi-num&quot;>STEP 4</div>
-        <div class=&quot;fi-label&quot;>py 파일 실행</div>
-        <div class=&quot;fi-sub&quot;>아래 명령어 입력</div>
-      </div>
-      <div class=&quot;flow-arrow&quot;>→</div>
-      <div class=&quot;flow-item&quot;>
-        <div class=&quot;fi-num&quot;>STEP 5</div>
-        <div class=&quot;fi-label&quot;>계좌 비밀번호</div>
-        <div class=&quot;fi-sub&quot;>팝업창에 입력</div>
-      </div>
-    </div>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;cmt&quot;># cmd에서 AutoTrader 폴더로 이동</span>
-<span class=&quot;cmd&quot;>cd C:\AutoTrader</span>
-
-<span class=&quot;cmt&quot;># 실행 (파일명은 본인 파일명으로 변경)</span>
-<span class=&quot;cmd&quot;>python v4_kiwoom_claude_ai_20260506_1551.py</span></div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🖥️ 실행 후 화면 요소 설명</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>화면 요소</th><th>의미</th><th>정상 상태</th></tr>
-        <tr><td>잔고</td><td>현재 예수금</td><td>실제 잔고와 일치</td></tr>
-        <tr><td>오늘손익</td><td>당일 실현 손익 합계</td><td>+/- 숫자 표시</td></tr>
-        <tr><td>승률</td><td>오늘 거래 승/패 비율</td><td>거래 없으면 0%</td></tr>
-        <tr><td>보유</td><td>현재보유 / 최대보유</td><td>0/5 (처음엔 0)</td></tr>
-        <tr><td>단타조건</td><td>단타 조건검색 결과 종목수</td><td>장중 숫자 표시</td></tr>
-        <tr><td>스윙조건</td><td>스윙 조건검색 결과 종목수</td><td>장중 숫자 표시</td></tr>
-      </table>
-    </div>
-    <div class=&quot;callout tip&quot;>
-      <span class=&quot;icon&quot;>💡</span>
-      <div><strong>로그 실시간 확인:</strong> <code>C:\AutoTrader\log_standard_날짜.txt</code> 파일을 메모장으로 열면 모든 매매 기록이 실시간으로 기록됩니다.</div>
-    </div>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>⏰ 자동매매 동작 시간표</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>시간</th><th>동작 내용</th></tr>
-        <tr><td><code>09:05</code> ~</td><td>매매 시작 (개장 후 5분 안정화 대기)</td></tr>
-        <tr><td>~ <code>15:10</code></td><td>단타 매수 가능 시간</td></tr>
-        <tr><td>~ <code>15:20</code></td><td>스윙 매수 가능 시간</td></tr>
-        <tr><td><code>15:30</code></td><td>장 마감. 미청산 단타 포지션은 강제청산 (설정에 따라)</td></tr>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- S10 -->
-<div class=&quot;section&quot; id=&quot;s10&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num green&quot;>10</div>
-    <h2>실전 운용 체크리스트 <small>매일 장 시작 전 확인하세요</small></h2>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>☑ 매일 오전 8:50 ~ 9:00 확인 사항</h3>
-    <ul class=&quot;checklist&quot;>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>영웅문 실행 및 로그인 완료</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>시스템 트레이에 OpenAPI+ 아이콘 확인</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>자동매매 프로그램 실행 (python 명령어)</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>화면 잔고가 실제 잔고와 일치하는지 확인</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>단타조건 / 스윙조건 숫자가 표시되는지 확인</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>로그 파일에 ERROR 메시지가 없는지 확인</span></li>
-      <li><div class=&quot;cb&quot; onclick=&quot;toggleCheck(this)&quot;></div><span class=&quot;cb-text&quot;>인터넷 연결 안정적인지 확인 (유선 권장)</span></li>
-    </ul>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>🔴 절대 하면 안 되는 것</h3>
-    <ol class=&quot;steps&quot;>
-      <li><strong>자동매매 실행 중 영웅문 강제 종료</strong> — 미체결 주문이 남아 수동 처리 필요</li>
-      <li><strong>동일 계좌로 HTS 수동 주문 + 자동매매 동시 사용</strong> — 수량/잔고 오류 발생</li>
-      <li><strong>PC 절전 모드/화면보호기 켜두기</strong> — 이벤트 루프 끊김으로 매매 누락</li>
-      <li><strong>Python 창을 강제로 닫기(X 버튼)</strong> — 반드시 프로그램 내 종료 버튼 사용</li>
-    </ol>
-  </div>
-  <div class=&quot;card&quot;>
-    <h3>💤 절전 모드 영구 비활성화 방법</h3>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;cmt&quot;># 관리자 권한 cmd에서 실행</span>
-<span class=&quot;cmd&quot;>powercfg /change standby-timeout-ac 0</span>
-<span class=&quot;cmt&quot;># 또는: 제어판 → 전원 옵션 → 절전 전환: &quot;안 함&quot;</span></div>
-  </div>
-</div>
-
-<!-- S11 -->
-<div class=&quot;section&quot; id=&quot;s11&quot;>
-  <div class=&quot;section-label&quot;>
-    <div class=&quot;step-num warn&quot;>11</div>
-    <h2>자주 묻는 오류 해결 <small>대부분의 문제는 여기서 해결됩니다</small></h2>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>❌ <code>No module named 'PyQt5'</code></h3>
-    <p>라이브러리가 설치되지 않았거나 64bit Python에 설치된 경우입니다.</p>
-    <div class=&quot;code-block&quot;><button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>COPY</button><span class=&quot;cmt&quot;># 32bit 확인 (32 이 나와야 함)</span>
-<span class=&quot;cmd&quot;>python -c &quot;import struct; print(struct.calcsize('P')*8)&quot;</span>
-
-<span class=&quot;cmt&quot;># 재설치</span>
-<span class=&quot;cmd&quot;>pip install PyQt5==5.15.9</span></div>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>❌ 로그인 창이 뜨지 않거나 OpenAPI 연결 실패</h3>
-    <ol class=&quot;steps&quot;>
-      <li>영웅문4가 먼저 실행되어 있는지 확인 — 영웅문 없이 API 단독 실행 불가</li>
-      <li>OpenAPI+ 모듈이 설치되어 있는지 확인 (3단계 참고)</li>
-      <li>Windows 방화벽 허용 여부 확인 — 첫 실행 시 &quot;허용&quot; 선택 필요</li>
-      <li>백신 프로그램이 차단 중인지 확인 — <code>C:\AutoTrader</code> 폴더를 예외 처리</li>
-    </ol>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>❌ 로그에 <code>'급등초입포착' 영웅문 미저장</code></h3>
-    <ol class=&quot;steps&quot;>
-      <li>영웅문 조건검색(0150) 화면에서 저장된 이름 목록 확인</li>
-      <li>이름이 다르면 우클릭 → <strong>&quot;이름 변경&quot;</strong>으로 정확히 수정</li>
-      <li>한글 자모나 띄어쓰기도 동일해야 합니다</li>
-    </ol>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>❌ 매수가 전혀 이루어지지 않음</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>체크 항목</th><th>확인 방법</th></tr>
-        <tr><td>거래 시간 외</td><td>09:05 ~ 15:10 사이인지 확인</td></tr>
-        <tr><td>잔고 부족</td><td>잔고 ≥ scalp_budget_pct × total_budget 이상인지 확인</td></tr>
-        <tr><td>일일손실한도 초과</td><td>로그에 &quot;일일손실한도&quot; 메시지 있으면 당일 매매 중단됨</td></tr>
-        <tr><td>조건검색 종목 없음</td><td>화면에 &quot;단타조건: 0종목&quot; 표시 → 조건검색식 점검</td></tr>
-        <tr><td>연속손절 자동 중단</td><td>로그에 &quot;30분 중단&quot; 메시지 → 30분 후 자동 재개</td></tr>
-        <tr><td>max_stocks 초과</td><td>현재 보유 종목수가 max_stocks에 달했는지 확인</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>❌ <code>계좌오류 / 주문실패</code></h3>
-    <ol class=&quot;steps&quot;>
-      <li>CONFIG의 <code>account</code> 값이 정확한지 확인 (10자리, 하이픈 없이)</li>
-      <li>모의투자 계좌번호와 실계좌 계좌번호를 혼동하지 않았는지 확인</li>
-      <li>영웅문에서 해당 계좌로 수동 주문이 되는지 먼저 테스트</li>
-    </ol>
-  </div>
-
-  <div class=&quot;card&quot;>
-    <h3>📞 추가 도움이 필요할 때</h3>
-    <div class=&quot;tbl-wrap&quot;>
-      <table>
-        <tr><th>채널</th><th>내용</th></tr>
-        <tr><td>키움증권 고객센터</td><td>1544-9000 (계좌·OpenAPI 관련)</td></tr>
-        <tr><td>KOA Studio 도움말</td><td>KOA Studio 실행 → F1 키</td></tr>
-        <tr><td>로그 파일</td><td><code>log_standard_날짜.txt</code> — 모든 오류 기록됨</td></tr>
-        <tr><td>리포트 파일</td><td><code>report_std_날짜_시간.json</code> — 거래 내역 기록</td></tr>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- 완료 배너 -->
-<div class=&quot;done-banner&quot;>
-  <div style=&quot;font-size:48px;margin-bottom:16px&quot;>🎉</div>
-  <h2>설정 완료!</h2>
-  <p>모든 단계를 마쳤다면 자동매매가 동작 중입니다.<br>처음 1~2주는 소액 또는 모의투자로 충분히 검증한 뒤 금액을 늘리세요.</p>
-  <div style=&quot;margin-top:24px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap&quot;>
-    <div style=&quot;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:12px 20px;font-size:13px&quot;>
-      📄 로그 확인<br><code style=&quot;color:var(--accent)&quot;>log_standard_*.txt</code>
-    </div>
-    <div style=&quot;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:12px 20px;font-size:13px&quot;>
-      📊 리포트 확인<br><code style=&quot;color:var(--accent3)&quot;>report_std_*.json</code>
-    </div>
-    <div style=&quot;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:12px 20px;font-size:13px&quot;>
-      ⚙️ 설정 변경<br><code style=&quot;color:var(--accent2)&quot;>CONFIG 섹션 수정</code>
-    </div>
-  </div>
-</div>
-
-</div><!-- /container -->
-
-<a class=&quot;fab&quot; href=&quot;#&quot;>↑</a>
-
-<script>
-window.addEventListener('scroll', () => {
-  const d = document.documentElement;
-  const pct = d.scrollTop / (d.scrollHeight - d.clientHeight) * 100;
-  document.getElementById('pbar').style.width = pct + '%';
-});
-
-function toggleToc(el) {
-  el.classList.toggle('open');
-  document.getElementById('tocBody').classList.toggle('open');
-}
-
-function copyCode(btn) {
-  const block = btn.parentElement;
-  const clone = block.cloneNode(true);
-  clone.querySelectorAll('button').forEach(b => b.remove());
-  const text = clone.innerText.trim();
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'COPIED';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1800);
-  });
-}
-
-function toggleCheck(cb) {
-  cb.classList.toggle('checked');
-  cb.parentElement.classList.toggle('done');
-}
-
-// 목차 자동 열기
-document.getElementById('tocBody').classList.add('open');
-document.querySelector('.toc-header').classList.add('open');
-</script>
-</body>
-</html>
-"
-        style="width:100%; height:calc(100vh - 160px); min-height:600px; border:none; display:block;"
-        title="키움 자동매매 완전 정복 가이드"
-        loading="lazy">
-      </iframe>
+    <h1 class="section-title">📋 V2 메뉴얼</h1>
+    <p class="section-desc">키움 자동매매 V2 — 준비 중입니다</p>
+    
+    <div style="background:linear-gradient(135deg,#f0f0f0 0%,#e8e8e8 100%); border-radius:14px; padding:48px 24px; text-align:center; margin-top:40px;">
+      <div style="font-size:64px; margin-bottom:16px;">🔧</div>
+      <h2 style="font-size:20px; font-weight:700; color:#666; margin-bottom:8px;">V2 메뉴얼 준비 중</h2>
+      <p style="font-size:14px; color:#999; margin-bottom:24px;">V2 매뉴얼은 곧 공개될 예정입니다.</p>
+      <button onclick="navClick(null, 'docs')" style="background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border:none; border-radius:8px; padding:12px 24px; font-weight:600; cursor:pointer; font-family:inherit; font-size:14px;">← 문서로 돌아가기</button>
     </div>
   </section>
 
@@ -2178,273 +1359,7 @@ document.querySelector('.toc-header').classList.add('open');
     </div>
   </section>
 
-  <!-- 📔 일기장 섹션 -->
-  <section id="diary" class="section">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <h1 class="section-title" style="margin-bottom:0;">📔 일기장</h1>
-      <div style="display:flex;gap:8px;">
-        <button onclick="openDiaryPinChange()" style="background:white;color:var(--accent);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">🔑 비밀번호 변경</button>
-        <button onclick="openDiaryWrite()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ 새 일기 쓰기</button>
-      </div>
-    </div>
-    <p class="section-desc">나만의 소중한 하루를 기록합니다. 🔒 숫자 6자리 비밀번호로 보호됩니다.</p>
-
-    <!-- 월 네비게이션 -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:6px;background:white;border:1px solid var(--border);border-radius:10px;padding:8px 12px;">
-        <button onclick="changeDiaryMonth(-1)" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-dim);line-height:1;">◀</button>
-        <span id="diary-month-label" style="font-size:14px;font-weight:700;min-width:90px;text-align:center;"></span>
-        <button onclick="changeDiaryMonth(1)" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-dim);line-height:1;">▶</button>
-      </div>
-      <span id="diary-count-badge" style="font-size:12px;color:var(--text-dim);background:#f5f3f0;padding:5px 12px;border-radius:100px;"></span>
-    </div>
-
-    <!-- 일기 목록 -->
-    <div id="diary-list" style="display:flex;flex-direction:column;gap:12px;"></div>
-    <div id="diary-empty" style="display:none;text-align:center;padding:60px;color:var(--text-dim);">
-      <div style="font-size:48px;margin-bottom:16px;">📔</div>
-      <div style="font-size:16px;font-weight:600;">이 달에 작성된 일기가 없어요</div>
-      <div style="font-size:13px;margin-top:8px;">위의 새 일기 쓰기 버튼을 눌러 오늘 하루를 기록해보세요!</div>
-    </div>
-  </section>
-
 </main>
-
-<!-- ── 하단 고정 미니바 ── -->
-<div id="bottom-mini-bar" style="
-  position:fixed; bottom:0; left:0; right:0; z-index:900;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-  padding:6px 16px 8px;
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(12px);
-  border-top:1px solid rgba(0,0,0,0.07);
-  box-shadow:0 -2px 12px rgba(0,0,0,0.06);
-">
-  <!-- 👥 방문자 -->
-  <div style="display:flex;align-items:center;gap:5px;background:#fff0ee;border-radius:20px;padding:5px 12px;border:1px solid #f5cdc7;">
-    <span style="font-size:14px;">👥</span>
-    <span style="font-size:10px;color:#b07068;font-weight:600;">누적</span>
-    <span style="font-size:13px;font-weight:700;color:#d4816f;" id="visitor-count">0</span>
-  </div>
-
-  <!-- 구분선 -->
-  <div style="width:1px;height:20px;background:#e0ddd9;"></div>
-
-  <!-- 📥 내보내기 -->
-  <button onclick="exportAllData()" title="내보내기" style="
-    display:flex;flex-direction:column;align-items:center;gap:1px;
-    background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:10px;
-    transition:background 0.2s;
-  " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
-    <span style="font-size:16px;">📥</span>
-    <span style="font-size:9px;color:#888;font-weight:600;">저장</span>
-  </button>
-
-  <!-- 📤 불러오기 -->
-  <button onclick="document.getElementById('import-all-file').click()" title="불러오기" style="
-    display:flex;flex-direction:column;align-items:center;gap:1px;
-    background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:10px;
-    transition:background 0.2s;
-  " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
-    <span style="font-size:16px;">📤</span>
-    <span style="font-size:9px;color:#888;font-weight:600;">불러오기</span>
-  </button>
-  <input type="file" id="import-all-file" accept=".json,.zip,.html" style="display:none;" onchange="importAllData(event)">
-
-  <!-- ☁️ 구글 드라이브 -->
-  <button onclick="saveToDrive()" title="Google Drive 저장" style="
-    display:flex;flex-direction:column;align-items:center;gap:1px;
-    background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:10px;
-    transition:background 0.2s;
-  " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
-    <span style="font-size:16px;">☁️</span>
-    <span style="font-size:9px;color:#888;font-weight:600;">Drive</span>
-  </button>
-
-  <!-- 구분선 -->
-  <div style="width:1px;height:20px;background:#e0ddd9;"></div>
-
-  <!-- ⚙️ 관리 -->
-  <button onclick="openAdminSection()" title="관리자" style="
-    display:flex;flex-direction:column;align-items:center;gap:1px;
-    background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:10px;
-    transition:background 0.2s;
-  " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
-    <span style="font-size:16px;">⚙️</span>
-    <span style="font-size:9px;color:#888;font-weight:600;">관리</span>
-  </button>
-</div>
-
-<!-- 🔑 일기장 비밀번호 변경 모달 -->
-<div id="diary-pin-change-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:5100;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:20px;padding:32px 28px;width:90%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,0.3);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:700;">🔑 비밀번호 변경</div>
-      <button onclick="closeDiaryPinChange()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-dim);">✕</button>
-    </div>
-
-    <!-- 현재 비밀번호 -->
-    <div style="margin-bottom:16px;">
-      <label style="font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:6px;">현재 비밀번호 (6자리)</label>
-      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;" id="dpc-cur-dots">
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cur" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-      </div>
-    </div>
-
-    <!-- 새 비밀번호 -->
-    <div style="margin-bottom:16px;">
-      <label style="font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:6px;">새 비밀번호 (6자리)</label>
-      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;" id="dpc-new-dots">
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot nw" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-      </div>
-    </div>
-
-    <!-- 새 비밀번호 확인 -->
-    <div style="margin-bottom:16px;">
-      <label style="font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:6px;">새 비밀번호 확인 (6자리)</label>
-      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;" id="dpc-cf-dots">
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-        <span class="dpc-dot cf" style="width:13px;height:13px;border-radius:50%;background:#ddd;display:inline-block;transition:all 0.2s;"></span>
-      </div>
-    </div>
-
-    <!-- 현재 입력중인 필드 표시 -->
-    <div id="dpc-field-label" style="text-align:center;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:12px;">① 현재 비밀번호 입력 중</div>
-
-    <!-- 숫자패드 -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;" id="dpc-keypad">
-      <button onclick="dpcPress('1')" class="diary-key" style="padding:11px;font-size:18px;">1</button>
-      <button onclick="dpcPress('2')" class="diary-key" style="padding:11px;font-size:18px;">2</button>
-      <button onclick="dpcPress('3')" class="diary-key" style="padding:11px;font-size:18px;">3</button>
-      <button onclick="dpcPress('4')" class="diary-key" style="padding:11px;font-size:18px;">4</button>
-      <button onclick="dpcPress('5')" class="diary-key" style="padding:11px;font-size:18px;">5</button>
-      <button onclick="dpcPress('6')" class="diary-key" style="padding:11px;font-size:18px;">6</button>
-      <button onclick="dpcPress('7')" class="diary-key" style="padding:11px;font-size:18px;">7</button>
-      <button onclick="dpcPress('8')" class="diary-key" style="padding:11px;font-size:18px;">8</button>
-      <button onclick="dpcPress('9')" class="diary-key" style="padding:11px;font-size:18px;">9</button>
-      <button onclick="dpcClear()" class="diary-key" style="padding:11px;font-size:12px;background:#fff0ee;color:var(--accent);">지우기</button>
-      <button onclick="dpcPress('0')" class="diary-key" style="padding:11px;font-size:18px;">0</button>
-      <button onclick="dpcDelete()" class="diary-key" style="padding:11px;font-size:16px;background:#f5f3f0;">⌫</button>
-    </div>
-
-    <p id="dpc-msg" style="font-size:12px;color:#e06b6b;text-align:center;min-height:18px;"></p>
-  </div>
-</div>
-<div id="diary-lock-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:5000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:20px;padding:36px 28px;width:90%;max-width:360px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
-    <div style="font-size:40px;margin-bottom:10px;">🔒</div>
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;">비공개 일기</h3>
-    <p style="font-size:13px;color:var(--text-dim);margin-bottom:24px;">내용을 보려면 숫자 6자리를 입력하세요</p>
-
-    <!-- 핀 디스플레이 -->
-    <div id="diary-pin-display" style="display:flex;justify-content:center;gap:10px;margin-bottom:20px;">
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-      <span class="diary-pin-dot" style="width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block;transition:background 0.2s;"></span>
-    </div>
-
-    <!-- 숫자패드 -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;" id="diary-keypad">
-      <button onclick="diaryPinPress('1')" class="diary-key">1</button>
-      <button onclick="diaryPinPress('2')" class="diary-key">2</button>
-      <button onclick="diaryPinPress('3')" class="diary-key">3</button>
-      <button onclick="diaryPinPress('4')" class="diary-key">4</button>
-      <button onclick="diaryPinPress('5')" class="diary-key">5</button>
-      <button onclick="diaryPinPress('6')" class="diary-key">6</button>
-      <button onclick="diaryPinPress('7')" class="diary-key">7</button>
-      <button onclick="diaryPinPress('8')" class="diary-key">8</button>
-      <button onclick="diaryPinPress('9')" class="diary-key">9</button>
-      <button onclick="diaryPinClear()" class="diary-key" style="background:#fff0ee;color:var(--accent);font-size:13px;">지우기</button>
-      <button onclick="diaryPinPress('0')" class="diary-key">0</button>
-      <button onclick="diaryPinDelete()" class="diary-key" style="background:#f5f3f0;font-size:18px;">⌫</button>
-    </div>
-
-    <p id="diary-pin-msg" style="font-size:12px;color:#e06b6b;min-height:18px;margin-bottom:8px;"></p>
-    <button onclick="closeDiaryLock()" style="font-size:13px;color:var(--text-dim);background:none;border:none;cursor:pointer;text-decoration:underline;">취소</button>
-  </div>
-</div>
-
-<!-- ✏️ 일기 작성/수정 모달 -->
-<div id="diary-write-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:5000;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;">
-  <div style="background:white;border-radius:18px;padding:32px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(0,0,0,0.2);margin:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:700;" id="diary-write-title">📔 새 일기 쓰기</div>
-      <button onclick="closeDiaryWrite()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-dim);">✕</button>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">날짜 (KST 자동입력)</label>
-      <input type="date" class="form-input" id="diary-date" readonly style="background:#fafaf8;color:var(--text-dim);">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">오늘의 기분</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="diary-mood-picker">
-        <span class="diary-mood-btn" onclick="selectMood(this,'😊')" data-mood="😊" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😊</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😄')" data-mood="😄" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😄</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😐')" data-mood="😐" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😐</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😔')" data-mood="😔" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😔</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😢')" data-mood="😢" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😢</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😤')" data-mood="😤" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😤</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'🥰')" data-mood="🥰" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">🥰</span>
-        <span class="diary-mood-btn" onclick="selectMood(this,'😴')" data-mood="😴" style="font-size:22px;padding:6px 10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;">😴</span>
-      </div>
-      <input type="hidden" id="diary-mood" value="😊">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">제목</label>
-      <input type="text" class="form-input" id="diary-title-input" placeholder="오늘 하루를 한 마디로 표현하면?">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">오늘의 일기</label>
-      <textarea class="form-input" id="diary-content-input" placeholder="오늘 하루는 어땠나요? 자유롭게 기록해보세요..." style="height:200px;resize:vertical;line-height:1.8;font-family:inherit;"></textarea>
-    </div>
-
-    <input type="hidden" id="diary-edit-id" value="">
-
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button onclick="closeDiaryWrite()" style="flex:1;padding:13px;border:1px solid var(--border);border-radius:10px;background:white;cursor:pointer;font-family:inherit;font-size:14px;">취소</button>
-      <button onclick="saveDiaryEntry()" style="flex:2;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;">💾 저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 📖 일기 읽기 모달 -->
-<div id="diary-read-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:5000;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;">
-  <div style="background:white;border-radius:18px;padding:32px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(0,0,0,0.2);margin:auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div style="font-size:36px;" id="diary-read-mood"></div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="editCurrentDiary()" style="padding:8px 16px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;">✏️ 수정</button>
-        <button onclick="deleteCurrentDiary()" style="padding:8px 16px;background:#fee;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;color:#e06b6b;">🗑️ 삭제</button>
-        <button onclick="closeDiaryRead()" style="padding:8px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-dim);">✕</button>
-      </div>
-    </div>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;" id="diary-read-date"></div>
-    <div style="font-size:11px;color:#b0a89e;margin-bottom:16px;" id="diary-read-modified"></div>
-    <h2 style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;margin-bottom:20px;line-height:1.4;" id="diary-read-title"></h2>
-    <div style="font-size:15px;line-height:1.9;color:var(--text);white-space:pre-wrap;border-top:1px solid var(--border);padding-top:20px;" id="diary-read-content"></div>
-  </div>
-</div>
 
 <!-- 📊 관리자 로그인 모달 -->
 <div id="admin-login-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
@@ -2790,110 +1705,127 @@ function saveBackupVersion(version, timestamp) {
   }
 }
 
-// ── 모두 다운로드 (HTML 2개) ──
+// ── 모두 다운로드 (index.html + backup 파일) ──
 async function downloadAllFilesAsZip() {
+  // 🔐 로그인 확인
   if (!isAdminLoggedIn) {
     alert('❌ 관리자로 로그인하세요');
     openAdminLogin();
     return;
   }
-
-  const kst      = getKSTDateTime();
-  const version  = getNextBackupVersion();
-  const dateStamp = `${kst.year}${kst.month}${kst.day}`;
-  const verName   = `Ver${version}_Web-test_${dateStamp}_Claude`;
-
-  const allData = {
-    가계부:    JSON.parse(localStorage.getItem('blog_ledger')       || '[]'),
-    메모:      JSON.parse(localStorage.getItem('blog_memos')        || '[]'),
-    블로그:    JSON.parse(localStorage.getItem('blog_posts')        || '[]'),
-    일기:      JSON.parse(localStorage.getItem('blog_diary')        || '[]'),
-    장소:      JSON.parse(localStorage.getItem('blog_places')       || '[]'),
-    결제카드:  JSON.parse(localStorage.getItem('card_config')       || '{}'),
-    거래내역:  JSON.parse(localStorage.getItem('blog_transactions') || '[]'),
-    관리자설정:JSON.parse(localStorage.getItem('admin_settings')   || '{}'),
-    방문자:    parseInt(localStorage.getItem('visitor_count')       || '0'),
-  };
-
-  let html = document.documentElement.outerHTML;
-  const embedScript = `<script id="__embedded__">window.__EMBEDDED_DATA__ = ${JSON.stringify(allData)};<\/script>`;
-  html = html.includes('id="__embedded__"')
-    ? html.replace(/<script id="__embedded__">[\s\S]*?<\/script>/, embedScript)
-    : html.replace('</head>', embedScript + '</head>');
-
-  function dlHTML(content, filename) {
-    const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+  
+  try {
+    const kst = getKSTDateTime();
+    const version = getNextBackupVersion();
+    const timestamp = `${kst.dateStr}_${kst.timeStr}`;
+    const fileName = `ver${version}_${timestamp}`;
+    
+    // 현재 페이지의 HTML 가져오기
+    const htmlContent = document.documentElement.outerHTML;
+    
+    // 백업 데이터 생성
+    const backupData = {
+      version: version,
+      timestamp: timestamp,
+      createdAt: new Date().toISOString(),
+      data: {
+        가계부: localStorage.getItem('blog_ledger') ? JSON.parse(localStorage.getItem('blog_ledger')) : [],
+        메모: localStorage.getItem('blog_memos') ? JSON.parse(localStorage.getItem('blog_memos')) : [],
+        블로그: localStorage.getItem('blog_posts') ? JSON.parse(localStorage.getItem('blog_posts')) : [],
+        장소: localStorage.getItem('blog_places') ? JSON.parse(localStorage.getItem('blog_places')) : [],
+        결제카드: localStorage.getItem('card_config') ? JSON.parse(localStorage.getItem('card_config')) : { credit: [], debit: [] },
+        거래내역: localStorage.getItem('blog_transactions') ? JSON.parse(localStorage.getItem('blog_transactions')) : [],
+        관리자설정: localStorage.getItem('admin_settings') ? JSON.parse(localStorage.getItem('admin_settings')) : {},
+        방문자: localStorage.getItem('visitor_count') ? parseInt(localStorage.getItem('visitor_count')) : 0,
+      }
+    };
+    
+    const backupJson = JSON.stringify(backupData, null, 2);
+    
+    // JSZip으로 압축 파일 생성
+    const zip = new JSZip();
+    zip.file('index.html', htmlContent);
+    zip.file(`backup_${fileName}.json`, backupJson);
+    
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${fileName}.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    // 백업 버전 저장
+    saveBackupVersion(version, timestamp);
+    alert(`✅ ${fileName}.zip 다운로드 완료!`);
+  } catch(err) {
+    alert('❌ 다운로드 중 오류: ' + err.message);
+    console.error(err);
   }
-
-  // ① 버전 파일
-  dlHTML(html, `${verName}.html`);
-
-  // ② index.html (1초 간격)
-  setTimeout(() => {
-    dlHTML(html, 'index.html');
-    saveBackupVersion(version, verName);
-    setTimeout(() => {
-      showToast(`✅ ${verName}.html 저장 완료!`);
-      alert(`✅ 다운로드 완료!\n\n1️⃣ ${verName}.html\n2️⃣ index.html`);
-    }, 300);
-  }, 1000);
 }
 
-async function exportAllData() {
+function exportAllData() {
   if (!isAdminLoggedIn) {
     alert('❌ 관리자로 로그인하세요');
     return;
   }
 
-  const kst      = getKSTDateTime();
-  const version  = getNextBackupVersion();
-  const dateStamp = `${kst.year}${kst.month}${kst.day}`;
-  const verName   = `Ver${version}_Web-test_${dateStamp}_Claude`;
+  // KST 시간 계산
+  const now = new Date();
+  const kstTime = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60000);
+  const year  = kstTime.getFullYear();
+  const month = String(kstTime.getMonth() + 1).padStart(2, '0');
+  const day   = String(kstTime.getDate()).padStart(2, '0');
+  const hour  = String(kstTime.getHours()).padStart(2, '0');
+  const min   = String(kstTime.getMinutes()).padStart(2, '0');
+  const sec   = String(kstTime.getSeconds()).padStart(2, '0');
 
-  // 데이터 내장 HTML 생성
+  const version = getNextBackupVersion();
+  const verFileName = `ver${version}_${year}_${month}${day}_${hour}${min}${sec}.html`;
+
+  // 현재 HTML (데이터 내장)
   const allData = {
-    가계부:    JSON.parse(localStorage.getItem('blog_ledger')       || '[]'),
-    메모:      JSON.parse(localStorage.getItem('blog_memos')        || '[]'),
-    블로그:    JSON.parse(localStorage.getItem('blog_posts')        || '[]'),
-    일기:      JSON.parse(localStorage.getItem('blog_diary')        || '[]'),
-    장소:      JSON.parse(localStorage.getItem('blog_places')       || '[]'),
-    결제카드:  JSON.parse(localStorage.getItem('card_config')       || '{}'),
-    거래내역:  JSON.parse(localStorage.getItem('blog_transactions') || '[]'),
-    관리자설정:JSON.parse(localStorage.getItem('admin_settings')   || '{}'),
-    방문자:    parseInt(localStorage.getItem('visitor_count')       || '0'),
+    가계부: JSON.parse(localStorage.getItem('blog_ledger') || '[]'),
+    메모: JSON.parse(localStorage.getItem('blog_memos') || '[]'),
+    블로그: JSON.parse(localStorage.getItem('blog_posts') || '[]'),
+    장소: JSON.parse(localStorage.getItem('blog_places') || '[]'),
+    결제카드: JSON.parse(localStorage.getItem('blog_cards') || '{}'),
+    거래내역: JSON.parse(localStorage.getItem('blog_transactions') || '[]'),
+    관리자설정: JSON.parse(localStorage.getItem('admin_settings') || '{}'),
+    방문자: parseInt(localStorage.getItem('visitor_count') || '0'),
   };
 
   let html = document.documentElement.outerHTML;
   const embedScript = `<script id="__embedded__">window.__EMBEDDED_DATA__ = ${JSON.stringify(allData)};<\/script>`;
-  html = html.includes('id="__embedded__"')
-    ? html.replace(/<script id="__embedded__">[\s\S]*?<\/script>/, embedScript)
-    : html.replace('</head>', embedScript + '</head>');
+  if (html.includes('id="__embedded__"')) {
+    html = html.replace(/<script id="__embedded__">[\s\S]*?<\/script>/, embedScript);
+  } else {
+    html = html.replace('</head>', embedScript + '</head>');
+  }
 
-  function dlHTML(content, filename) {
-    const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
   }
 
-  // ① 버전 파일 먼저
-  dlHTML(html, `${verName}.html`);
+  // ✅ 파일 1: index.html (원본)
+  downloadFile(html, 'index.html', 'text/html');
 
-  // ② index.html (1초 간격 — 브라우저 팝업 차단 우회)
+  // ✅ 파일 2: ver1_2026_0502_143052.html (버전 파일)
   setTimeout(() => {
-    dlHTML(html, 'index.html');
-    saveBackupVersion(version, verName);
+    downloadFile(html, verFileName, 'text/html');
+    saveBackupVersion(version, `${year}_${month}${day}_${hour}${min}${sec}`);
     setTimeout(() => {
-      alert(`✅ 다운로드 완료!\n\n1️⃣ ${verName}.html\n2️⃣ index.html\n\n두 파일 모두 브라우저에서 바로 열 수 있습니다.`);
+      alert(`✅ 2개 파일 다운로드 완료!\n\n1️⃣ index.html\n2️⃣ ${verFileName}`);
     }, 300);
-  }, 1000);
+  }, 600);
 }
 
 // ── 🔄 전체 데이터 불러오기 ──
@@ -2919,7 +1851,7 @@ function importAllData(event) {
           // index.html 또는 backup 파일 찾기
           let jsonFile = null;
           for (let filename in zip.files) {
-            if (filename.endsWith('.json')) {
+            if (filename.includes('backup_') || filename.endsWith('.json')) {
               jsonFile = filename;
               break;
             }
@@ -2963,7 +1895,6 @@ function loadImportedData(importedData) {
     if (data.가계부) localStorage.setItem('blog_ledger', JSON.stringify(data.가계부));
     if (data.메모) localStorage.setItem('blog_memos', JSON.stringify(data.메모));
     if (data.블로그) localStorage.setItem('blog_posts', JSON.stringify(data.블로그));
-    if (data.일기) localStorage.setItem('blog_diary', JSON.stringify(data.일기));
     if (data.장소) localStorage.setItem('blog_places', JSON.stringify(data.장소));
     if (data.결제카드) localStorage.setItem('blog_cards', JSON.stringify(data.결제카드));
     if (data.거래내역) localStorage.setItem('blog_transactions', JSON.stringify(data.거래내역));
@@ -2981,10 +1912,6 @@ function loadImportedData(importedData) {
     if (data.블로그) {
       const existing = JSON.parse(localStorage.getItem('blog_posts') || '[]');
       localStorage.setItem('blog_posts', JSON.stringify([...existing, ...data.블로그]));
-    }
-    if (data.일기) {
-      const existing = JSON.parse(localStorage.getItem('blog_diary') || '[]');
-      localStorage.setItem('blog_diary', JSON.stringify([...existing, ...data.일기]));
     }
     if (data.장소) {
       const existing = JSON.parse(localStorage.getItem('blog_places') || '[]');
@@ -4254,9 +3181,6 @@ window.addEventListener('load', () => {
   
   // 🔐 sessionStorage에서 직접 확인 - 새로고침해도 로그인 유지
   isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-  if (!isAdminLoggedIn) {
-    setTimeout(() => openAdminLogin(), 500);
-  }
   
   // 비밀번호 입력 필드 필터링 설정
   const adminPasswordInput = document.getElementById('admin-password');
@@ -4282,464 +3206,6 @@ document.addEventListener('keydown', (e) => {
     openAdminLogin();
   }
 });
-
-// ══════════════════════════════
-// 📔 일기장 기능
-// ══════════════════════════════
-const DIARY_PIN_KEY  = 'diary_pin_hash';
-const DIARY_DATA_KEY = 'blog_diary';
-const DIARY_DEFAULT_PIN = '000000';
-
-let diaryPinBuffer    = '';
-let diaryUnlocked     = false;
-let diaryPinCallback  = null; // 인증 후 실행할 콜백
-let currentDiaryId    = null;
-let diaryCurrentMonth = ''; // 'YYYY-MM'
-
-// ── KST 날짜 헬퍼 ──
-function getKSTDateStr() {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  return kst.toISOString().slice(0, 10);
-}
-function formatKSTDateTime(isoStr) {
-  const d = new Date(isoStr);
-  const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-  const y = kst.getFullYear();
-  const mo = String(kst.getMonth()+1).padStart(2,'0');
-  const day = String(kst.getDate()).padStart(2,'0');
-  const h = String(kst.getHours()).padStart(2,'0');
-  const mi = String(kst.getMinutes()).padStart(2,'0');
-  return `${y}.${mo}.${day} ${h}:${mi}`;
-}
-function formatDateKorean(dateStr) { // 'YYYY-MM-DD' → 'YYYY년 M월 D일 (요일)'
-  const days = ['일','월','화','수','목','금','토'];
-  const d = new Date(dateStr + 'T00:00:00');
-  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}요일)`;
-}
-
-// ── 해시 (관리자 hashPassword 재활용) ──
-function hashDiaryPin(pin) { return hashPassword(pin); }
-
-// ── PIN 저장/확인 ──
-function getDiaryPinHash() {
-  return localStorage.getItem(DIARY_PIN_KEY) || hashDiaryPin(DIARY_DEFAULT_PIN);
-}
-function isDiaryPinSet() {
-  return !!localStorage.getItem(DIARY_PIN_KEY);
-}
-
-// ── 일기 데이터 CRUD ──
-function getDiaries() {
-  try { return JSON.parse(localStorage.getItem(DIARY_DATA_KEY) || '[]'); }
-  catch { return []; }
-}
-function saveDiaries(list) {
-  localStorage.setItem(DIARY_DATA_KEY, JSON.stringify(list));
-}
-
-// ── 일기장 메뉴 클릭 (비밀번호 먼저) ──
-function openDiarySection() {
-  if (!isAdminLoggedIn) {
-    alert('❌ 로그인 후 사용할 수 있습니다');
-    return;
-  }
-  // 비밀번호 없이 바로 목록으로 진입
-  showDiarySection();
-}
-
-function showDiarySection() {
-  // 섹션 전환
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('diary').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  window.scrollTo(0, 0);
-  closeSidebar();
-  // 다른 섹션에서 돌아오면 잠금 초기화 (프라이버시 보호)
-  diaryUnlocked = false;
-  // 이번 달로 초기화
-  if (!diaryCurrentMonth) {
-    const kstNow = new Date(new Date().getTime() + 9*60*60*1000);
-    diaryCurrentMonth = `${kstNow.getFullYear()}-${String(kstNow.getMonth()+1).padStart(2,'0')}`;
-  }
-  renderDiaryList();
-}
-
-// ── 월 이동 ──
-function changeDiaryMonth(delta) {
-  const [y, m] = diaryCurrentMonth.split('-').map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  diaryCurrentMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  renderDiaryList();
-}
-
-// ── 일기 목록 렌더링 ──
-function renderDiaryList() {
-  const [y, m] = diaryCurrentMonth.split('-').map(Number);
-  const label = `${y}년 ${m}월`;
-  document.getElementById('diary-month-label').textContent = label;
-
-  const all = getDiaries();
-  const filtered = all
-    .filter(d => d.date.startsWith(diaryCurrentMonth))
-    .sort((a, b) => b.date.localeCompare(a.date));
-
-  const listEl  = document.getElementById('diary-list');
-  const emptyEl = document.getElementById('diary-empty');
-  const badge   = document.getElementById('diary-count-badge');
-
-  badge.textContent = `${filtered.length}개의 일기`;
-  listEl.innerHTML = '';
-
-  if (filtered.length === 0) {
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  filtered.forEach(entry => {
-    const card = document.createElement('div');
-    card.className = 'diary-card';
-    card.onclick = () => openDiaryRead(entry.id);
-
-    const modifiedStr = entry.updatedAt
-      ? `최종 수정: ${formatKSTDateTime(entry.updatedAt)}`
-      : `작성: ${formatKSTDateTime(entry.createdAt)}`;
-
-    card.innerHTML = `
-      <div class="diary-card-mood">${entry.mood || '📔'}</div>
-      <div class="diary-card-body">
-        <div class="diary-card-date">${formatDateKorean(entry.date)}</div>
-        <div class="diary-card-title">${escapeHtml(entry.title) || '(제목 없음)'}</div>
-        <div class="diary-card-meta">🔒 ${modifiedStr}</div>
-      </div>
-      <div style="color:var(--text-dim);font-size:20px;padding-right:4px;">›</div>
-    `;
-    listEl.appendChild(card);
-  });
-}
-
-function escapeHtml(str) {
-  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── 새 일기 쓰기 버튼 ──
-function openDiaryWrite(editId) {
-  if (!diaryUnlocked) {
-    openDiaryLock(() => openDiaryWrite(editId));
-    return;
-  }
-  const modal = document.getElementById('diary-write-modal');
-  modal.style.display = 'flex';
-
-  if (editId) {
-    const entry = getDiaries().find(d => d.id === editId);
-    if (!entry) return;
-    document.getElementById('diary-write-title').textContent = '✏️ 일기 수정';
-    document.getElementById('diary-date').value = entry.date;
-    document.getElementById('diary-title-input').value = entry.title || '';
-    document.getElementById('diary-content-input').value = entry.content || '';
-    document.getElementById('diary-edit-id').value = editId;
-    document.getElementById('diary-mood').value = entry.mood || '😊';
-    // 기분 선택 표시
-    document.querySelectorAll('.diary-mood-btn').forEach(btn => {
-      btn.style.border = btn.dataset.mood === (entry.mood || '😊')
-        ? '2px solid var(--accent)' : '2px solid transparent';
-    });
-  } else {
-    document.getElementById('diary-write-title').textContent = '📔 새 일기 쓰기';
-    document.getElementById('diary-date').value = getKSTDateStr();
-    document.getElementById('diary-title-input').value = '';
-    document.getElementById('diary-content-input').value = '';
-    document.getElementById('diary-edit-id').value = '';
-    document.getElementById('diary-mood').value = '😊';
-    document.querySelectorAll('.diary-mood-btn').forEach((btn, i) => {
-      btn.style.border = i === 0 ? '2px solid var(--accent)' : '2px solid transparent';
-    });
-  }
-}
-
-function closeDiaryWrite() {
-  document.getElementById('diary-write-modal').style.display = 'none';
-}
-
-function selectMood(el, mood) {
-  document.getElementById('diary-mood').value = mood;
-  document.querySelectorAll('.diary-mood-btn').forEach(b => {
-    b.style.border = b === el ? '2px solid var(--accent)' : '2px solid transparent';
-  });
-}
-
-function saveDiaryEntry() {
-  const date    = document.getElementById('diary-date').value;
-  const title   = document.getElementById('diary-title-input').value.trim();
-  const content = document.getElementById('diary-content-input').value.trim();
-  const mood    = document.getElementById('diary-mood').value;
-  const editId  = document.getElementById('diary-edit-id').value;
-
-  if (!content) { showToast('📔 내용을 입력해주세요'); return; }
-
-  const now  = new Date().toISOString();
-  const list = getDiaries();
-
-  if (editId) {
-    const idx = list.findIndex(d => d.id === editId);
-    if (idx > -1) {
-      list[idx] = { ...list[idx], date, title, content, mood, updatedAt: now };
-    }
-    showToast('✅ 일기가 수정되었습니다');
-  } else {
-    list.push({ id: 'diary_' + Date.now(), date, title, content, mood, createdAt: now, updatedAt: null });
-    showToast('✅ 일기가 저장되었습니다');
-  }
-
-  saveDiaries(list);
-  closeDiaryWrite();
-  // 작성된 달로 이동
-  diaryCurrentMonth = date.slice(0, 7);
-  renderDiaryList();
-}
-
-// ── 일기 읽기 (클릭 시 비밀번호 확인 후 열람) ──
-function openDiaryRead(id) {
-  currentDiaryId = id;
-  // 이미 잠금 해제된 세션이면 바로 열람
-  if (diaryUnlocked) {
-    _showDiaryReadModal(id);
-  } else {
-    openDiaryLock(() => {
-      _showDiaryReadModal(id);
-    });
-  }
-}
-
-function _showDiaryReadModal(id) {
-  const entry = getDiaries().find(d => d.id === id);
-  if (!entry) return;
-
-  document.getElementById('diary-read-mood').textContent = entry.mood || '📔';
-  document.getElementById('diary-read-date').textContent = formatDateKorean(entry.date);
-  const modLabel = entry.updatedAt
-    ? `✏️ 수정됨: ${formatKSTDateTime(entry.updatedAt)}`
-    : `작성: ${formatKSTDateTime(entry.createdAt)}`;
-  document.getElementById('diary-read-modified').textContent = modLabel;
-  document.getElementById('diary-read-title').textContent = entry.title || '(제목 없음)';
-  document.getElementById('diary-read-content').textContent = entry.content || '';
-
-  document.getElementById('diary-read-modal').style.display = 'flex';
-}
-
-function closeDiaryRead() {
-  document.getElementById('diary-read-modal').style.display = 'none';
-  currentDiaryId = null;
-}
-
-function editCurrentDiary() {
-  if (!currentDiaryId) return;
-  closeDiaryRead();
-  openDiaryWrite(currentDiaryId);
-}
-
-function deleteCurrentDiary() {
-  if (!currentDiaryId) return;
-  if (!confirm('이 일기를 삭제할까요?')) return;
-  const list = getDiaries().filter(d => d.id !== currentDiaryId);
-  saveDiaries(list);
-  closeDiaryRead();
-  renderDiaryList();
-  showToast('🗑️ 일기가 삭제되었습니다');
-}
-
-// ── 비밀번호(PIN) 잠금 모달 ──
-function openDiaryLock(callback) {
-  diaryPinBuffer = '';
-  diaryPinCallback = callback || null;
-  updatePinDisplay();
-  document.getElementById('diary-pin-msg').textContent = isDiaryPinSet()
-    ? '비밀번호를 입력하세요'
-    : `초기 비밀번호: ${DIARY_DEFAULT_PIN}`;
-  document.getElementById('diary-lock-modal').style.display = 'flex';
-}
-
-function closeDiaryLock() {
-  document.getElementById('diary-lock-modal').style.display = 'none';
-  diaryPinBuffer = '';
-  diaryPinCallback = null;
-  updatePinDisplay();
-}
-
-function diaryPinPress(num) {
-  if (diaryPinBuffer.length >= 6) return;
-  diaryPinBuffer += num;
-  updatePinDisplay();
-  if (diaryPinBuffer.length === 6) {
-    setTimeout(verifyDiaryPin, 120);
-  }
-}
-
-function diaryPinDelete() {
-  diaryPinBuffer = diaryPinBuffer.slice(0, -1);
-  updatePinDisplay();
-}
-
-function diaryPinClear() {
-  diaryPinBuffer = '';
-  updatePinDisplay();
-}
-
-function updatePinDisplay() {
-  const dots = document.querySelectorAll('.diary-pin-dot');
-  dots.forEach((dot, i) => {
-    dot.style.background = i < diaryPinBuffer.length ? 'var(--accent)' : '#ddd';
-    dot.style.transform = i < diaryPinBuffer.length ? 'scale(1.2)' : 'scale(1)';
-  });
-}
-
-function verifyDiaryPin() {
-  const stored = getDiaryPinHash();
-  const input  = hashDiaryPin(diaryPinBuffer);
-  if (input === stored) {
-    diaryUnlocked = true;
-    document.getElementById('diary-lock-modal').style.display = 'none';
-    document.getElementById('diary-pin-msg').textContent = '';
-    diaryPinBuffer = '';
-    updatePinDisplay();
-    if (diaryPinCallback) { diaryPinCallback(); diaryPinCallback = null; }
-  } else {
-    document.getElementById('diary-pin-msg').textContent = '❌ 비밀번호가 틀렸습니다';
-    // 진동 효과
-    const keypad = document.getElementById('diary-keypad');
-    keypad.style.animation = 'none';
-    keypad.offsetHeight; // reflow
-    keypad.style.transition = 'transform 0.1s';
-    let s = 0;
-    const shake = setInterval(() => {
-      keypad.style.transform = s % 2 === 0 ? 'translateX(-6px)' : 'translateX(6px)';
-      s++;
-      if (s > 5) { clearInterval(shake); keypad.style.transform = 'translateX(0)'; }
-    }, 60);
-    diaryPinBuffer = '';
-    updatePinDisplay();
-  }
-}
-
-// ── 일기장 비밀번호 변경 UI ──
-// 3단계: 현재PW → 새PW → 새PW확인
-let dpcStep   = 'cur'; // 'cur' | 'new' | 'cf'
-let dpcCurBuf = '';
-let dpcNewBuf = '';
-let dpcCfBuf  = '';
-
-const DPC_STEP_LABELS = {
-  cur: '① 현재 비밀번호 입력 중',
-  new: '② 새 비밀번호 입력 중',
-  cf:  '③ 새 비밀번호 다시 입력 중',
-};
-
-function openDiaryPinChange() {
-  if (!diaryUnlocked) {
-    openDiaryLock(() => openDiaryPinChange());
-    return;
-  }
-  dpcStep = 'cur'; dpcCurBuf = ''; dpcNewBuf = ''; dpcCfBuf = '';
-  dpcRefreshDots();
-  document.getElementById('dpc-msg').textContent = '';
-  document.getElementById('dpc-field-label').textContent = DPC_STEP_LABELS.cur;
-  document.getElementById('diary-pin-change-modal').style.display = 'flex';
-}
-
-function closeDiaryPinChange() {
-  document.getElementById('diary-pin-change-modal').style.display = 'none';
-}
-
-function dpcPress(num) {
-  if (dpcStep === 'cur' && dpcCurBuf.length < 6) { dpcCurBuf += num; dpcRefreshDots(); if (dpcCurBuf.length === 6) setTimeout(dpcNext, 120); }
-  else if (dpcStep === 'new' && dpcNewBuf.length < 6) { dpcNewBuf += num; dpcRefreshDots(); if (dpcNewBuf.length === 6) setTimeout(dpcNext, 120); }
-  else if (dpcStep === 'cf'  && dpcCfBuf.length  < 6) { dpcCfBuf  += num; dpcRefreshDots(); if (dpcCfBuf.length  === 6) setTimeout(dpcNext, 120); }
-}
-
-function dpcDelete() {
-  if (dpcStep === 'cur') dpcCurBuf = dpcCurBuf.slice(0,-1);
-  else if (dpcStep === 'new') dpcNewBuf = dpcNewBuf.slice(0,-1);
-  else dpcCfBuf = dpcCfBuf.slice(0,-1);
-  dpcRefreshDots();
-}
-
-function dpcClear() {
-  if (dpcStep === 'cur') dpcCurBuf = '';
-  else if (dpcStep === 'new') dpcNewBuf = '';
-  else dpcCfBuf = '';
-  dpcRefreshDots();
-}
-
-function dpcRefreshDots() {
-  const update = (cls, buf) => {
-    document.querySelectorAll(`.dpc-dot.${cls}`).forEach((dot, i) => {
-      dot.style.background = i < buf.length
-        ? (cls === 'cur' ? '#6b6359' : cls === 'nw' ? 'var(--accent)' : '#5cba7d')
-        : '#ddd';
-      dot.style.transform = i < buf.length ? 'scale(1.2)' : 'scale(1)';
-    });
-  };
-  update('cur', dpcCurBuf);
-  update('nw',  dpcNewBuf);
-  update('cf',  dpcCfBuf);
-}
-
-function dpcNext() {
-  const msgEl = document.getElementById('dpc-msg');
-  const labelEl = document.getElementById('dpc-field-label');
-
-  if (dpcStep === 'cur') {
-    // 현재 비밀번호 확인
-    if (hashDiaryPin(dpcCurBuf) !== getDiaryPinHash()) {
-      msgEl.textContent = '❌ 현재 비밀번호가 틀렸습니다';
-      dpcShake();
-      dpcCurBuf = ''; dpcRefreshDots(); return;
-    }
-    msgEl.textContent = '✅ 확인됨! 새 비밀번호를 입력하세요';
-    dpcStep = 'new';
-    labelEl.textContent = DPC_STEP_LABELS.new;
-
-  } else if (dpcStep === 'new') {
-    msgEl.textContent = '';
-    dpcStep = 'cf';
-    labelEl.textContent = DPC_STEP_LABELS.cf;
-
-  } else if (dpcStep === 'cf') {
-    if (dpcNewBuf !== dpcCfBuf) {
-      msgEl.textContent = '❌ 새 비밀번호가 일치하지 않습니다';
-      dpcShake();
-      dpcCfBuf = ''; dpcRefreshDots(); return;
-    }
-    // 변경 성공
-    localStorage.setItem(DIARY_PIN_KEY, hashDiaryPin(dpcNewBuf));
-    closeDiaryPinChange();
-    showToast('🔑 일기장 비밀번호가 변경되었습니다!');
-  }
-}
-
-function dpcShake() {
-  const kp = document.getElementById('dpc-keypad');
-  let s = 0;
-  const iv = setInterval(() => {
-    kp.style.transform = s % 2 === 0 ? 'translateX(-6px)' : 'translateX(6px)';
-    s++;
-    if (s > 5) { clearInterval(iv); kp.style.transform = 'translateX(0)'; }
-  }, 60);
-}
-
-// ── 일기장 비밀번호 변경 (기존 콘솔 함수 유지) ──
-function changeDiaryPin(newPin) {
-  if (!/^\d{6}$/.test(newPin)) { alert('❌ 숫자 6자리로 입력하세요'); return; }
-  localStorage.setItem(DIARY_PIN_KEY, hashDiaryPin(newPin));
-  showToast('🔒 일기장 비밀번호가 변경되었습니다');
-}
-
-// ── 일기 데이터 내보내기/가져오기 지원 (기존 exportAllData 확장) ──
-const _origExport = exportAllData;
-// 데이터 백업 시 일기 포함
-const _origDownload = downloadAllFilesAsZip;
 
 // ✅ 방법2: Google Drive에 저장
 async function saveToDrive() {
