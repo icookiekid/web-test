@@ -3295,5 +3295,34 @@ function getGoogleToken() {
 }
 
 </script>
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDz72TLiwFFXKYLnfc8YLdp24iPMJBxj78",
+    authDomain: "icookiekid-gpt.firebaseapp.com",
+    projectId: "icookiekid-gpt",
+    storageBucket: "icookiekid-gpt.firebasestorage.app",
+    messagingSenderId: "1059572182395",
+    appId: "1:1059572182395:web:cf28784aa3bcf2cfb221de"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.firebaseApp = app;
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+
+  console.log("Firebase 연결 완료");
+</script>
+
+</body>
+</html>
 </body>
 </html>
