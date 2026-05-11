@@ -820,10 +820,10 @@
   </div>
 
   <ul class="nav-menu">
-    <button class="nav-item" data-section="home" active" onclick="navClick(this, 'home')">
+    <button class="nav-item active" data-section="home" onclick="navClick(this, 'home')">
       <span class="nav-icon">🏠</span><span>홈</span>
     </button>
-    <button class="nav-item" data-section="blog"" onclick="navClick(this, 'blog')">
+    <button class="nav-item" data-section="blog" onclick="navClick(this, 'blog')">
       <span class="nav-icon">📚</span><span>블로그</span>
     </button>
 
@@ -888,7 +888,7 @@
       </div>
     </div>
 
-    <button class="nav-item" data-section="about"" onclick="navClick(this, 'about')">
+    <button class="nav-item" data-section="about" onclick="navClick(this, 'about')">
       <span class="nav-icon">👤</span><span>소개</span>
     </button>
   </ul>
@@ -913,6 +913,12 @@
       <button onclick="exportAllData()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📥 내보내기</button>
       <button onclick="document.getElementById('import-all-file').click()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📤 불러오기</button>
       <button onclick="saveToDrive()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">☁️ Drive 저장</button>
+      <button onclick="firebasePromptLogin()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">🔐 Firebase 로그인</button>
+      <button onclick="firebasePromptSignUp()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📝 Firebase 가입</button>
+      <button onclick="firebaseManualSave()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">☁️ Firebase 저장</button>
+      <button onclick="firebaseManualLoad()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">⬇️ Firebase 불러오기</button>
+      <button onclick="firebaseLogout()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">🚪 Firebase 로그아웃</button>
+      <div id="firebase-sync-status" style="color:white; font-size:10px; line-height:1.4; opacity:0.9; padding:3px 2px; max-width:180px; word-break:break-all;">Firebase: 대기</div>
       <input type="file" id="import-all-file" accept=".json,.zip" style="display:none;" onchange="importAllData(event)">
     </div>
     <!-- 하단 미니바 -->
@@ -1874,7 +1880,8 @@ function importAllData(event) {
           alert('❌ ZIP 파일을 읽는 중 오류가 발생했습니다:\n' + err.message);
         });
       } else if (file.name.endsWith('.json')) {
-        importedData = JSON.parse(e.target.result);
+        const jsonText = typeof e.target.result === 'string' ? e.target.result : new TextDecoder('utf-8').decode(e.target.result);
+        importedData = JSON.parse(jsonText);
         loadImportedData(importedData);
       } else {
         alert('❌ JSON 또는 ZIP 파일만 지원합니다.');
@@ -3223,7 +3230,9 @@ async function saveToDrive() {
   const hour  = String(kstTime.getHours()).padStart(2, '0');
   const min   = String(kstTime.getMinutes()).padStart(2, '0');
   const sec   = String(kstTime.getSeconds()).padStart(2, '0');
-  const fileName = `백업_${year}_${month}${day}_${hour}${min}${sec}.json`;
+  const version = getNextBackupVersion();
+  const timestamp = `${year}_${month}${day}_${hour}${min}${sec}`;
+  const fileName = `백업_${timestamp}.json`;
 
   const allData = {
     version, timestamp,
@@ -3298,8 +3307,27 @@ function getGoogleToken() {
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    where,
+    updateDoc,
+    deleteDoc,
+    doc,
+    setDoc,
+    getDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDz72TLiwFFXKYLnfc8YLdp24iPMJBxj78",
@@ -3318,8 +3346,318 @@ function getGoogleToken() {
   window.firebaseAuth = auth;
   window.firebaseDb = db;
 
-  console.log("Firebase 연결 완료");
+  // ═══════════════════════════════════════════════════════════════
+  // 🔥 전체 메뉴 Firebase 동기화 설정
+  // - 기존 localStorage 기능은 그대로 유지합니다.
+  // - 로그인된 상태에서는 각 메뉴 데이터가 Firestore에도 함께 저장됩니다.
+  // ═══════════════════════════════════════════════════════════════
+  const FIREBASE_SITE_ID = "web-test";
+  const FIREBASE_DATA_KEYS = [
+    "blog_ledger",        // 가계부
+    "blog_memos",         // 메모
+    "blog_posts",         // 블로그 글
+    "nav_places",         // 네비게이션 장소
+    "blog_places",        // 예전 장소 백업 키
+    "card_config",        // 카드 관리
+    "blog_cards",         // 예전 카드 백업 키
+    "blog_transactions",  // 예전 거래 백업 키
+    "admin_settings",     // 관리자 설정
+    "visitor_count",      // 방문자 수
+    "backup_versions"     // 백업 버전
+  ];
+
+  let firebaseSyncTimer = null;
+  let firebaseIsApplyingCloudData = false;
+  let firebaseLastStatus = "대기";
+
+  function firebaseStatus(message) {
+    firebaseLastStatus = message;
+    console.log("🔥 Firebase:", message);
+    const el = document.getElementById("firebase-sync-status");
+    if (el) el.textContent = "Firebase: " + message;
+  }
+
+  function firebaseUserDocRef() {
+    const user = auth.currentUser;
+    if (!user) return null;
+    return doc(db, "users", user.uid, "siteData", FIREBASE_SITE_ID);
+  }
+
+  function collectAllMenuData() {
+    const data = {};
+    FIREBASE_DATA_KEYS.forEach((key) => {
+      data[key] = localStorage.getItem(key);
+    });
+    return data;
+  }
+
+  function applyAllMenuData(data) {
+    if (!data) return;
+    firebaseIsApplyingCloudData = true;
+    try {
+      FIREBASE_DATA_KEYS.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+          if (data[key] === null || data[key] === undefined) localStorage.removeItem(key);
+          else localStorage.setItem(key, data[key]);
+        }
+      });
+    } finally {
+      firebaseIsApplyingCloudData = false;
+    }
+    refreshAllMenusAfterFirebaseSync();
+  }
+
+  function refreshAllMenusAfterFirebaseSync() {
+    // 기존 화면 렌더링 함수들을 가능한 범위에서 다시 실행합니다.
+    const safeCalls = [
+      () => window.buildPaymentSelect?.(),
+      () => window.setType?.(window.txType || "income"),
+      () => window.renderList?.(),
+      () => window.renderSummary?.(),
+      () => window.renderYearlySummary?.(),
+      () => window.renderMemos?.(),
+      () => window.renderPosts?.(),
+      () => window.renderPlaces?.(),
+      () => window.updateVisitorDisplay?.(),
+      () => window.renderCardMgrList?.()
+    ];
+    safeCalls.forEach((fn) => {
+      try { fn(); } catch (e) { /* 아직 열리지 않은 메뉴는 무시 */ }
+    });
+  }
+
+  async function saveAllMenuDataToFirebase(reason = "auto") {
+    const ref = firebaseUserDocRef();
+    if (!ref) {
+      firebaseStatus("로그인 필요");
+      return { success: false, error: "로그인이 필요합니다." };
+    }
+    try {
+      await setDoc(ref, {
+        siteId: FIREBASE_SITE_ID,
+        updatedAt: serverTimestamp(),
+        updatedReason: reason,
+        data: collectAllMenuData()
+      }, { merge: true });
+      firebaseStatus("저장 완료");
+      return { success: true };
+    } catch (error) {
+      console.error("❌ Firebase 전체 저장 실패:", error);
+      firebaseStatus("저장 실패");
+      return { success: false, error: error.message };
+    }
+  }
+
+  async function loadAllMenuDataFromFirebase() {
+    const ref = firebaseUserDocRef();
+    if (!ref) {
+      firebaseStatus("로그인 필요");
+      return { success: false, error: "로그인이 필요합니다." };
+    }
+    try {
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        firebaseStatus("클라우드 데이터 없음");
+        return { success: true, empty: true };
+      }
+      const cloud = snap.data();
+      applyAllMenuData(cloud.data || {});
+      firebaseStatus("불러오기 완료");
+      return { success: true, data: cloud.data || {} };
+    } catch (error) {
+      console.error("❌ Firebase 전체 불러오기 실패:", error);
+      firebaseStatus("불러오기 실패");
+      return { success: false, error: error.message };
+    }
+  }
+
+  function queueFirebaseAutoSave(key) {
+    if (firebaseIsApplyingCloudData) return;
+    if (!FIREBASE_DATA_KEYS.includes(key)) return;
+    if (!auth.currentUser) return;
+    clearTimeout(firebaseSyncTimer);
+    firebaseStatus("저장 예약");
+    firebaseSyncTimer = setTimeout(() => {
+      saveAllMenuDataToFirebase("localStorage:" + key);
+    }, 800);
+  }
+
+  // 기존 localStorage 저장 코드를 건드리지 않고, 저장 이벤트만 감지해서 Firebase에 반영합니다.
+  const originalSetItem = Storage.prototype.setItem;
+  const originalRemoveItem = Storage.prototype.removeItem;
+  const originalClear = Storage.prototype.clear;
+
+  Storage.prototype.setItem = function(key, value) {
+    const result = originalSetItem.apply(this, arguments);
+    if (this === localStorage) queueFirebaseAutoSave(key);
+    return result;
+  };
+
+  Storage.prototype.removeItem = function(key) {
+    const result = originalRemoveItem.apply(this, arguments);
+    if (this === localStorage) queueFirebaseAutoSave(key);
+    return result;
+  };
+
+  Storage.prototype.clear = function() {
+    const result = originalClear.apply(this, arguments);
+    if (this === localStorage && auth.currentUser && !firebaseIsApplyingCloudData) {
+      clearTimeout(firebaseSyncTimer);
+      firebaseSyncTimer = setTimeout(() => saveAllMenuDataToFirebase("localStorage:clear"), 800);
+    }
+    return result;
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🔐 Authentication 함수
+  // ═══════════════════════════════════════════════════════════════
+  window.firebaseSignUp = async (email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await saveAllMenuDataToFirebase("signup");
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error("❌ 회원가입 실패:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseLogin = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error("❌ 로그인 실패:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseLogout = async () => {
+    try {
+      await signOut(auth);
+      firebaseStatus("로그아웃");
+      return { success: true };
+    } catch (error) {
+      console.error("❌ 로그아웃 실패:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseGetCurrentUser = () => auth.currentUser;
+  window.firebaseOnAuthStateChanged = (callback) => onAuthStateChanged(auth, callback);
+
+  window.firebasePromptSignUp = async () => {
+    const email = prompt("Firebase 회원가입 이메일을 입력하세요.");
+    if (!email) return;
+    const password = prompt("비밀번호를 입력하세요. 6자 이상이어야 합니다.");
+    if (!password) return;
+    const result = await window.firebaseSignUp(email.trim(), password.trim());
+    if (result.success) alert("✅ Firebase 회원가입 완료
+현재 모든 메뉴 데이터가 클라우드 저장 대상입니다.");
+    else alert("❌ 회원가입 실패
+" + result.error);
+  };
+
+  window.firebasePromptLogin = async () => {
+    const email = prompt("Firebase 로그인 이메일을 입력하세요.");
+    if (!email) return;
+    const password = prompt("비밀번호를 입력하세요.");
+    if (!password) return;
+    const result = await window.firebaseLogin(email.trim(), password.trim());
+    if (result.success) alert("✅ Firebase 로그인 완료
+클라우드 데이터를 확인합니다.");
+    else alert("❌ 로그인 실패
+" + result.error);
+  };
+
+  window.firebaseManualSave = async () => {
+    const result = await saveAllMenuDataToFirebase("manual");
+    if (result.success) alert("✅ 모든 메뉴 데이터를 Firebase에 저장했습니다.");
+    else alert("❌ Firebase 저장 실패
+" + result.error);
+  };
+
+  window.firebaseManualLoad = async () => {
+    if (!confirm("Firebase 클라우드 데이터를 현재 브라우저로 불러올까요?
+현재 화면의 로컬 데이터가 클라우드 데이터로 바뀔 수 있습니다.")) return;
+    const result = await loadAllMenuDataFromFirebase();
+    if (result.success) alert(result.empty ? "ℹ️ 아직 Firebase에 저장된 데이터가 없습니다." : "✅ Firebase 데이터를 불러왔습니다.");
+    else alert("❌ Firebase 불러오기 실패
+" + result.error);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📊 기존 범용 Firestore 함수들
+  // ═══════════════════════════════════════════════════════════════
+  window.firebaseAddData = async (collectionName, data) => {
+    try {
+      const docRef = await addDoc(collection(db, collectionName), {
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseGetAllData = async (collectionName) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, collectionName));
+      const data = [];
+      querySnapshot.forEach((docItem) => data.push({ id: docItem.id, ...docItem.data() }));
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseQueryData = async (collectionName, fieldName, value) => {
+    try {
+      const q = query(collection(db, collectionName), where(fieldName, "==", value));
+      const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((docItem) => data.push({ id: docItem.id, ...docItem.data() }));
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseUpdateData = async (collectionName, docId, data) => {
+    try {
+      await updateDoc(doc(db, collectionName, docId), { ...data, updatedAt: new Date() });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  window.firebaseDeleteData = async (collectionName, docId) => {
+    try {
+      await deleteDoc(doc(db, collectionName, docId));
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      firebaseStatus("로그인됨: " + user.email);
+      const loadResult = await loadAllMenuDataFromFirebase();
+      if (loadResult.empty) await saveAllMenuDataToFirebase("firstLogin");
+    } else {
+      firebaseStatus("로그아웃 상태");
+    }
+  });
+
+  firebaseStatus("연결 완료");
 </script>
+
+<!-- 최종 생성일자: 2026-05-12 00:10:55 KST -->
+<div style="position:fixed; left:10px; bottom:10px; z-index:850; background:rgba(255,255,255,0.78); border:1px solid rgba(0,0,0,0.08); border-radius:8px; padding:4px 8px; font-size:10px; color:#6b6359; backdrop-filter:blur(6px);">최종 생성일자: 2026-05-12 00:10:55 KST</div>
 
 </body>
 </html>
