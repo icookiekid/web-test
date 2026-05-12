@@ -1643,6 +1643,19 @@ function closeAllFolders() {
 
 // 외부 클릭시 드롭다운 닫기
 document.addEventListener('click', (e) => {
+  // sync-panel 내부 클릭이면 무시
+  const syncPanel = document.getElementById('sync-panel');
+  const syncButton = e.target.closest('button[title="동기화"]');
+  
+  if (e.target.closest('#sync-panel') || syncButton) {
+    return;
+  }
+  
+  // sync-panel 패널 닫기
+  if (syncPanel && syncPanel.style.display === 'flex') {
+    syncPanel.style.display = 'none';
+  }
+  
   // 네비게이션 메뉴 내부 클릭이면 무시
   if (e.target.closest('.nav-folder') || e.target.closest('.nav-submenu')) {
     return;
