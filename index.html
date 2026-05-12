@@ -907,21 +907,21 @@
   </section>
 
   <!-- 👥 방문자수 + 동기화 - 우측 하단 고정 -->
-  <div style="position:fixed; bottom:16px; right:16px; z-index:900; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+  <div style="position:fixed; bottom:16px; right:16px; z-index:900; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
     <!-- 동기화 패널 (🔄 클릭 시 토글) -->
-    <div id="sync-panel" style="display:none; background:rgba(30,20,50,0.88); backdrop-filter:blur(8px); border-radius:10px; padding:8px; flex-direction:column; gap:5px;">
-      <button onclick="exportAllData()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📥 내보내기</button>
-      <button onclick="document.getElementById('import-all-file').click()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">📤 불러오기</button>
-      <button onclick="saveToDrive()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; font-size:11px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left;">☁️ Drive 저장</button>
+    <div id="sync-panel" style="display:none; background:rgba(30,20,50,0.88); backdrop-filter:blur(8px); border-radius:10px; padding:10px; flex-direction:column; gap:8px;">
+      <button onclick="exportAllData(); document.getElementById('sync-panel').style.display='none';" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:10px 14px; font-size:12px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left; transition:all 0.2s; font-weight:500;">📥 내보내기</button>
+      <button onclick="document.getElementById('import-all-file').click(); document.getElementById('sync-panel').style.display='none';" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:10px 14px; font-size:12px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left; transition:all 0.2s; font-weight:500;">📤 불러오기</button>
+      <button onclick="saveToDrive(); document.getElementById('sync-panel').style.display='none';" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:10px 14px; font-size:12px; cursor:pointer; font-family:inherit; white-space:nowrap; text-align:left; transition:all 0.2s; font-weight:500;">☁️ Drive 저장</button>
       <input type="file" id="import-all-file" accept=".json,.zip" style="display:none;" onchange="importAllData(event)">
     </div>
     <!-- 하단 미니바 -->
-    <div style="background:rgba(30,20,50,0.75); backdrop-filter:blur(8px); border-radius:10px; padding:5px 10px; display:flex; align-items:center; gap:8px;">
-      <span style="font-size:11px; color:rgba(255,255,255,0.6);">👥</span>
-      <span style="font-size:11px; color:white; font-weight:600;" id="visitor-count">0</span>
-      <div style="width:1px; height:12px; background:rgba(255,255,255,0.2);"></div>
-      <button onclick="openAdminSection()" title="관리자" style="background:none; border:none; font-size:13px; cursor:pointer; padding:0; line-height:1;">⚙️</button>
-      <button onclick="(function(){var p=document.getElementById('sync-panel');p.style.display=p.style.display==='flex'?'none':'flex';})()" title="동기화" style="background:none; border:none; font-size:13px; cursor:pointer; padding:0; line-height:1;">🔄</button>
+    <div style="background:rgba(30,20,50,0.85); backdrop-filter:blur(8px); border-radius:12px; padding:10px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+      <span style="font-size:13px; color:rgba(255,255,255,0.7);">👥</span>
+      <span style="font-size:13px; color:white; font-weight:700;" id="visitor-count">0</span>
+      <div style="width:1.5px; height:16px; background:rgba(255,255,255,0.3);"></div>
+      <button onclick="openAdminSection()" title="관리자" style="background:none; border:none; font-size:18px; cursor:pointer; padding:6px; line-height:1; transition:all 0.2s; border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">⚙️</button>
+      <button onclick="(function(){var p=document.getElementById('sync-panel');p.style.display=p.style.display==='flex'?'none':'flex';})()" title="동기화" style="background:none; border:none; font-size:18px; cursor:pointer; padding:6px; line-height:1; transition:all 0.2s; border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">🔄</button>
     </div>
   </div>
 
@@ -1366,17 +1366,54 @@
   <div style="background:white; border-radius:12px; padding:32px; width:90%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div style="text-align:center; margin-bottom:24px;">
       <div style="font-size:32px; margin-bottom:12px;">🔐</div>
-      <h3 style="font-size:20px; font-weight:700; color:#2a2520;">관리자 로그인</h3>
-      <p style="font-size:13px; color:#6b6359; margin-top:4px;">비밀번호를 입력하세요</p>
+      <h3 style="font-size:20px; font-weight:700; color:#2a2520;">Firebase 로그인</h3>
+      <p style="font-size:13px; color:#6b6359; margin-top:4px;">이메일과 비밀번호를 입력하세요</p>
     </div>
     
-    <div style="margin-bottom:16px;">
-      <input type="password" id="admin-password" placeholder="비밀번호 입력 (영문만)" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px;" inputmode="latin" onkeypress="if(event.key==='Enter') verifyAdminPassword()">
+    <div style="margin-bottom:12px;">
+      <input type="email" id="firebase-login-email" placeholder="이메일" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px;">
     </div>
+
+    <div style="margin-bottom:16px;">
+      <input type="password" id="firebase-login-password" placeholder="비밀번호" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px;" onkeypress="if(event.key==='Enter') firebaseLoginHandler()">
+    </div>
+
+    <div id="firebase-login-error" style="color:#ff4757; font-size:12px; margin-bottom:12px; text-align:center; display:none;"></div>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+      <button onclick="closeAdminLogin()" style="background:#f0f0f0; color:#2a2520; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">취소</button>
+      <button onclick="firebaseLoginHandler()" style="background:linear-gradient(135deg,#d4816f,#e5a398); color:white; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">로그인</button>
+    </div>
+
+    <div style="border-top:1px solid #eee; padding-top:12px;">
+      <p style="font-size:12px; color:#6b6359; text-align:center; margin-bottom:8px;">계정이 없으신가요?</p>
+      <button onclick="showFirebaseSignup()" style="width:100%; background:#f0f0f0; color:#2a2520; border:none; border-radius:8px; padding:10px; font-weight:600; cursor:pointer; font-family:inherit; font-size:13px;">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase 회원가입 모달 -->
+<div id="firebase-signup-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:10001; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:12px; padding:32px; width:90%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:32px; margin-bottom:12px;">📝</div>
+      <h3 style="font-size:20px; font-weight:700; color:#2a2520;">회원가입</h3>
+      <p style="font-size:13px; color:#6b6359; margin-top:4px;">새 계정을 만들어보세요</p>
+    </div>
+    
+    <div style="margin-bottom:12px;">
+      <input type="email" id="firebase-signup-email" placeholder="이메일" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px;">
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <input type="password" id="firebase-signup-password" placeholder="비밀번호 (6자 이상)" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px;" onkeypress="if(event.key==='Enter') firebaseSignupHandler()">
+    </div>
+
+    <div id="firebase-signup-error" style="color:#ff4757; font-size:12px; margin-bottom:12px; text-align:center; display:none;"></div>
     
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-      <button onclick="closeAdminLogin()" style="background:#f0f0f0; color:#2a2520; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">취소</button>
-      <button onclick="verifyAdminPassword()" style="background:linear-gradient(135deg,#d4816f,#e5a398); color:white; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">로그인</button>
+      <button onclick="hideFirebaseSignup()" style="background:#f0f0f0; color:#2a2520; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">취소</button>
+      <button onclick="firebaseSignupHandler()" style="background:linear-gradient(135deg,#4CAF50,#45a049); color:white; border:none; border-radius:8px; padding:12px; font-weight:600; cursor:pointer; font-family:inherit;">회원가입</button>
     </div>
   </div>
 </div>
@@ -3025,12 +3062,29 @@ function openAdminSection() {
 
 function openAdminLogin() {
   document.getElementById('admin-login-modal').style.display = 'flex';
-  document.getElementById('admin-password').focus();
+  document.getElementById('firebase-login-email').focus();
 }
 
 function closeAdminLogin() {
   document.getElementById('admin-login-modal').style.display = 'none';
-  document.getElementById('admin-password').value = '';
+  document.getElementById('firebase-login-email').value = '';
+  document.getElementById('firebase-login-password').value = '';
+  document.getElementById('firebase-login-error').style.display = 'none';
+}
+
+function showFirebaseSignup() {
+  document.getElementById('admin-login-modal').style.display = 'none';
+  document.getElementById('firebase-signup-modal').style.display = 'flex';
+  document.getElementById('firebase-signup-email').focus();
+}
+
+function hideFirebaseSignup() {
+  document.getElementById('firebase-signup-modal').style.display = 'none';
+  document.getElementById('firebase-signup-email').value = '';
+  document.getElementById('firebase-signup-password').value = '';
+  document.getElementById('firebase-signup-error').style.display = 'none';
+  document.getElementById('admin-login-modal').style.display = 'flex';
+  document.getElementById('firebase-login-email').focus();
 }
 
 function closeAdminPanel() {
@@ -3046,28 +3100,67 @@ function openAdminPanel() {
   document.getElementById('admin-panel-modal').style.justifyContent = 'center';
 }
 
-function verifyAdminPassword() {
-  const password = document.getElementById('admin-password').value;
-  
-  if (!password) {
-    showToast('🔐 비밀번호를 입력하세요');
+// 🔥 Firebase 로그인 핸들러
+async function firebaseLoginHandler() {
+  const email = document.getElementById('firebase-login-email').value.trim();
+  const password = document.getElementById('firebase-login-password').value;
+  const errorDiv = document.getElementById('firebase-login-error');
+
+  if (!email || !password) {
+    errorDiv.textContent = '이메일과 비밀번호를 입력하세요';
+    errorDiv.style.display = 'block';
     return;
   }
-  
-  const settings = getAdminSettings();
-  const inputHash = hashPassword(password);
-  
-  if (inputHash === settings.passwordHash) {
-    isAdminLoggedIn = true; // ✅ 로그인 성공 표시
-    sessionStorage.setItem('adminLoggedIn', 'true'); // ✅ 새로고침해도 유지
-    closeAdminLogin();
-    // ❌ openAdminPanel() 제거 - 패널 자동 열기 안 함
-    updateVisitorDisplay();
-    showToast('✅ 로그인 성공!');
-  } else {
-    showToast('❌ 비밀번호가 틀렸습니다');
-    document.getElementById('admin-password').value = '';
-    document.getElementById('admin-password').focus();
+
+  try {
+    const result = await window.firebaseLogin(email, password);
+    if (result.success) {
+      isAdminLoggedIn = true;
+      sessionStorage.setItem('adminLoggedIn', 'true');
+      sessionStorage.setItem('currentUserEmail', result.user.email);
+      closeAdminLogin();
+      updateVisitorDisplay();
+      showToast('✅ 로그인 성공!');
+    } else {
+      errorDiv.textContent = result.error || '로그인 실패';
+      errorDiv.style.display = 'block';
+    }
+  } catch (error) {
+    errorDiv.textContent = error.message;
+    errorDiv.style.display = 'block';
+  }
+}
+
+// 🔥 Firebase 회원가입 핸들러
+async function firebaseSignupHandler() {
+  const email = document.getElementById('firebase-signup-email').value.trim();
+  const password = document.getElementById('firebase-signup-password').value;
+  const errorDiv = document.getElementById('firebase-signup-error');
+
+  if (!email || !password) {
+    errorDiv.textContent = '이메일과 비밀번호를 입력하세요';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  if (password.length < 6) {
+    errorDiv.textContent = '비밀번호는 6자 이상이어야 합니다';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  try {
+    const result = await window.firebaseSignUp(email, password);
+    if (result.success) {
+      showToast('✅ 회원가입 성공! 이제 로그인하세요');
+      hideFirebaseSignup();
+    } else {
+      errorDiv.textContent = result.error || '회원가입 실패';
+      errorDiv.style.display = 'block';
+    }
+  } catch (error) {
+    errorDiv.textContent = error.message;
+    errorDiv.style.display = 'block';
   }
 }
 
@@ -3332,7 +3425,15 @@ function getGoogleToken() {
       return { success: true, user: userCredential.user };
     } catch (error) {
       console.error("❌ 회원가입 실패:", error.message);
-      return { success: false, error: error.message };
+      let errorMsg = error.message;
+      if (error.code === 'auth/email-already-in-use') {
+        errorMsg = '이미 존재하는 이메일입니다';
+      } else if (error.code === 'auth/weak-password') {
+        errorMsg = '비밀번호가 너무 약합니다 (6자 이상)';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMsg = '올바르지 않은 이메일 형식입니다';
+      }
+      return { success: false, error: errorMsg };
     }
   };
 
@@ -3344,7 +3445,15 @@ function getGoogleToken() {
       return { success: true, user: userCredential.user };
     } catch (error) {
       console.error("❌ 로그인 실패:", error.message);
-      return { success: false, error: error.message };
+      let errorMsg = error.message;
+      if (error.code === 'auth/user-not-found') {
+        errorMsg = '등록되지 않은 이메일입니다';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMsg = '비밀번호가 틀렸습니다';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMsg = '올바르지 않은 이메일 형식입니다';
+      }
+      return { success: false, error: errorMsg };
     }
   };
 
