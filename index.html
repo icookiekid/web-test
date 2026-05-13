@@ -1091,6 +1091,122 @@
     font-weight:700;
   }
 
+
+
+  /* ── Ver15: 모바일 전용 메뉴 겹침 방지 + 문서 메뉴 터치 개선 ──
+     모바일에서는 상단 메뉴를 2열 그리드로 고정해서 2번째 줄이 1/3번째 줄에 끼어 보이지 않게 합니다.
+     PC 화면은 기존 상단 가로 메뉴 방식을 그대로 사용합니다. */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: static !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      padding: 12px 12px 14px !important;
+      display: block !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important;
+      z-index: 50 !important;
+    }
+    .logo {
+      margin: 0 0 10px 0 !important;
+      width: 100% !important;
+      justify-content: center !important;
+    }
+    .nav-menu {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+      width: 100% !important;
+      flex: none !important;
+      align-items: stretch !important;
+      overflow: visible !important;
+    }
+    .nav-menu > .nav-item,
+    .nav-menu > .nav-folder {
+      width: 100% !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      position: relative !important;
+      overflow: visible !important;
+    }
+    .nav-item,
+    .nav-folder-btn {
+      width: 100% !important;
+      min-height: 44px !important;
+      padding: 9px 10px !important;
+      justify-content: center !important;
+      gap: 5px !important;
+      font-size: 12.5px !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      border: 1px solid rgba(0,0,0,0.06) !important;
+      background: #fff !important;
+    }
+    .nav-item.active,
+    .nav-folder-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2)) !important;
+      color: #fff !important;
+    }
+    .nav-icon {
+      width: auto !important;
+      min-width: 16px !important;
+      font-size: 15px !important;
+      text-align: center !important;
+    }
+    .nav-folder-toggle {
+      font-size: 9px !important;
+      margin-left: 2px !important;
+    }
+    .nav-submenu {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      margin-top: 6px !important;
+      box-shadow: none !important;
+      border-radius: 10px !important;
+      z-index: 1 !important;
+      overflow: hidden !important;
+    }
+    .nav-submenu.open {
+      max-height: 520px !important;
+      overflow: visible !important;
+    }
+    .nav-subitem {
+      min-height: 40px !important;
+      padding: 9px 10px !important;
+      font-size: 12px !important;
+      gap: 6px !important;
+    }
+    main {
+      margin-top: 0 !important;
+      padding: 16px !important;
+    }
+    .docs-menu-card,
+    .v1doc-btn,
+    .doc-back-btn {
+      touch-action: manipulation !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .nav-item,
+    .nav-folder-btn {
+      font-size: 11.5px !important;
+      padding-left: 7px !important;
+      padding-right: 7px !important;
+    }
+    .nav-icon { font-size: 14px !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -1210,7 +1326,7 @@
       <div class="docs-section-block" id="study-docs">
         <h2 class="docs-block-title"><span class="docs-heading-icon">💻</span> 블로그 공부 자료</h2>
         <div class="docs-menu-list">
-          <button class="docs-menu-card" onclick="navClick(null, 'codeguide')">
+          <button type="button" class="docs-menu-card" onclick="navClick(null, 'codeguide')">
             <span class="docs-menu-icon">💻</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">index.html 코드 한 줄 해설</span>
@@ -1224,7 +1340,7 @@
       <div class="docs-section-block" id="firebase-docs">
         <h2 class="docs-block-title"><span class="docs-heading-icon">🔐</span> Firebase 참고 문서</h2>
         <div class="docs-menu-list">
-          <button class="docs-menu-card" onclick="alert('Firebase 콘솔 설정은 Authentication, 승인된 도메인, Firestore Rules 순서로 확인하세요. 저장 경로는 users / 내 UID / sites / web-test 입니다.');">
+          <button type="button" class="docs-menu-card" onclick="alert('Firebase 콘솔 설정은 Authentication, 승인된 도메인, Firestore Rules 순서로 확인하세요. 저장 경로는 users / 내 UID / sites / web-test 입니다.');">
             <span class="docs-menu-icon">📖</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">Firebase 설정 가이드</span>
@@ -1233,7 +1349,7 @@
             <span class="docs-menu-arrow">›</span>
           </button>
 
-          <button class="docs-menu-card" id="function-docs" onclick="alert('Authentication 로그인 후 Firestore 경로 users / 내 UID / sites / web-test 문서에 저장하고 불러오는 구조입니다.');">
+          <button type="button" class="docs-menu-card" id="function-docs" onclick="alert('Authentication 로그인 후 Firestore 경로 users / 내 UID / sites / web-test 문서에 저장하고 불러오는 구조입니다.');">
             <span class="docs-menu-icon">⚙️</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">함수 사용법</span>
@@ -1242,7 +1358,7 @@
             <span class="docs-menu-arrow">›</span>
           </button>
 
-          <button class="docs-menu-card" id="change-docs" onclick="alert('Ver13: index.html 코드 한 줄 해설 문서를 별도 파일 없이 index.html 내부에 통합했습니다. Firebase 경로는 users / 내 UID / sites / web-test 그대로 유지합니다.');">
+          <button type="button" class="docs-menu-card" id="change-docs" onclick="alert('Ver13: index.html 코드 한 줄 해설 문서를 별도 파일 없이 index.html 내부에 통합했습니다. Firebase 경로는 users / 내 UID / sites / web-test 그대로 유지합니다.');">
             <span class="docs-menu-icon">📝</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">변경사항 (Ver13)</span>
@@ -1256,7 +1372,7 @@
       <div class="docs-section-block" id="trading-docs">
         <h2 class="docs-block-title"><span class="docs-heading-icon">🤖</span> 자동매매 자료</h2>
         <div class="docs-menu-list">
-          <button class="docs-menu-card" onclick="navClick(null, 'v1docs')">
+          <button type="button" class="docs-menu-card" onclick="navClick(null, 'v1docs')">
             <span class="docs-menu-icon">📋</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">v1 매뉴얼</span>
@@ -1265,7 +1381,7 @@
             <span class="docs-menu-arrow">›</span>
           </button>
 
-          <button class="docs-menu-card disabled" onclick="navClick(null, 'v2docs')">
+          <button type="button" class="docs-menu-card disabled" onclick="navClick(null, 'v2docs')">
             <span class="docs-menu-icon">🧩</span>
             <span class="docs-menu-body">
               <span class="docs-menu-title">v2 매뉴얼</span>
@@ -1286,7 +1402,7 @@
         <h1 class="section-title" style="margin-bottom:4px;">💻 index.html 코드 한 줄 해설</h1>
         <p class="section-desc" style="margin-bottom:0;">현재 web-test 블로그 코드를 초보자도 볼 수 있도록 줄마다 설명한 공부용 문서입니다.</p>
       </div>
-      <button class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함</button>
+      <button type="button" class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함</button>
     </div>
     <div class="docs-note" style="margin-bottom:14px;">
       이 문서는 이제 별도 HTML 파일을 불러오지 않고 <strong>index.html 내부에 통합</strong>되어 있습니다. GitHub에는 <strong>index.html 하나만</strong> 올리면 됩니다.
@@ -1303,23 +1419,23 @@
         <h1 class="section-title" style="margin-bottom:4px;">🤖 자동매매 v1 문서</h1>
         <p class="section-desc" style="margin-bottom:0;">문서 보관함 안에 저장된 키움 자동매매 v1 자료입니다.</p>
       </div>
-      <button class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함</button>
+      <button type="button" class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함</button>
     </div>
     <div class="v1doc-grid">
       <div class="v1doc-list-panel">
         <div class="v1doc-list-title">자료 목록</div>
-          <button class="v1doc-btn" onclick="showV1Doc(0)">📘 사용설명서 통합본</button>
-          <button class="v1doc-btn" onclick="showV1Doc(1)">📗 가이드 · 기본형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(2)">📗 가이드 · GPT형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(3)">📗 가이드 · Claude형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(4)">💻 코드 · 기본형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(5)">💻 코드 · GPT형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(6)">💻 코드 · Claude형</button>
-          <button class="v1doc-btn" onclick="showV1Doc(7)">🔍 조건1 · 급등초입포착</button>
-          <button class="v1doc-btn" onclick="showV1Doc(8)">🔍 조건2 · 눌림목반등</button>
-          <button class="v1doc-btn" onclick="showV1Doc(9)">🔍 조건3 · MACD골든크로스</button>
-          <button class="v1doc-btn" onclick="showV1Doc(10)">🔍 조건4 · 급등모멘텀</button>
-          <button class="v1doc-btn" onclick="showV1Doc(11)">🔍 조건5 · 외국인연속매수</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(0)">📘 사용설명서 통합본</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(1)">📗 가이드 · 기본형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(2)">📗 가이드 · GPT형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(3)">📗 가이드 · Claude형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(4)">💻 코드 · 기본형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(5)">💻 코드 · GPT형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(6)">💻 코드 · Claude형</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(7)">🔍 조건1 · 급등초입포착</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(8)">🔍 조건2 · 눌림목반등</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(9)">🔍 조건3 · MACD골든크로스</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(10)">🔍 조건4 · 급등모멘텀</button>
+          <button type="button" class="v1doc-btn" onclick="showV1Doc(11)">🔍 조건5 · 외국인연속매수</button>
       </div>
       <div class="v1doc-viewer-panel">
         <iframe id="v1doc-viewer" title="자동매매 v1 문서 보기" scrolling="no"></iframe>
@@ -1339,7 +1455,7 @@
           <span class="docs-menu-desc">나중에 새 자료를 추가할 때 이 위치에 보관됩니다.</span>
         </span>
       </div>
-      <div style="margin-top:16px;"><button class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함으로 돌아가기</button></div>
+      <div style="margin-top:16px;"><button type="button" class="doc-back-btn" onclick="navClick(null, 'docs')">← 문서 보관함으로 돌아가기</button></div>
     </div>
   </section>
 
@@ -1932,7 +2048,9 @@ function getSavedNavOrder() {
 }
 
 function saveNavOrder(order) {
-  localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(normalizeNavOrder(order)));
+  const normalized = normalizeNavOrder(order);
+  localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(normalized));
+  return normalized;
 }
 
 function getCurrentNavOrder() {
@@ -1944,7 +2062,7 @@ function getCurrentNavOrder() {
 
 function applyNavOrder(order = getSavedNavOrder()) {
   const nav = document.getElementById('nav-menu');
-  if (!nav) return;
+  if (!nav) return getSavedNavOrder();
   const normalized = normalizeNavOrder(order);
   const items = {};
   [...nav.children].forEach(el => {
@@ -1954,7 +2072,15 @@ function applyNavOrder(order = getSavedNavOrder()) {
   normalized.forEach(key => {
     if (items[key]) nav.appendChild(items[key]);
   });
-  saveNavOrder(normalized);
+  return saveNavOrder(normalized);
+}
+
+function persistAndApplyNavOrder(order, message) {
+  const normalized = saveNavOrder(order);
+  applyNavOrder(normalized);
+  renderNavOrderSettings();
+  if (message) showToast(message);
+  return normalized;
 }
 
 function renderNavOrderSettings() {
@@ -1992,10 +2118,7 @@ function moveNavMenuItem(key, direction) {
     order.splice(idx, 1);
     order.unshift(key);
   }
-  saveNavOrder(order);
-  applyNavOrder(order);
-  renderNavOrderSettings();
-  showToast('✅ 메뉴 순서가 저장되었습니다');
+  persistAndApplyNavOrder(order, '✅ 메뉴 순서가 저장되었습니다');
 }
 
 let draggingNavKey = null;
@@ -2016,18 +2139,29 @@ function menuOrderDrop(event, targetKey) {
   if (fromIdx < 0 || toIdx < 0) return;
   order.splice(fromIdx, 1);
   order.splice(toIdx, 0, fromKey);
-  saveNavOrder(order);
-  applyNavOrder(order);
-  renderNavOrderSettings();
-  showToast('✅ 드래그한 메뉴 순서가 저장되었습니다');
+  persistAndApplyNavOrder(order, '✅ 드래그한 메뉴 순서가 저장되었습니다');
 }
 
 function resetNavOrder() {
   if (!confirm('상단 메뉴 순서를 기본값으로 되돌릴까요?')) return;
-  saveNavOrder(DEFAULT_NAV_ORDER);
-  applyNavOrder(DEFAULT_NAV_ORDER);
-  renderNavOrderSettings();
-  showToast('↩️ 메뉴 순서가 기본값으로 복원되었습니다');
+  persistAndApplyNavOrder(DEFAULT_NAV_ORDER, '↩️ 메뉴 순서가 기본값으로 복원되었습니다');
+}
+
+
+function initNavOrderSystem() {
+  try {
+    const savedOrder = getSavedNavOrder();
+    applyNavOrder(savedOrder);
+    renderNavOrderSettings();
+  } catch (error) {
+    console.warn('메뉴 순서 초기화 오류:', error);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initNavOrderSystem);
+} else {
+  initNavOrderSystem();
 }
 
 // 외부 클릭시 드롭다운 닫기
@@ -2806,8 +2940,7 @@ function renderMemos(order = 'newest') {
 // 페이지 로드 시 메모 표시
 // 페이지 로드 시 메모 표시
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.readyState === 'loading') return;
-  try { applyNavOrder(); renderNavOrderSettings(); } catch(e) {}
+  try { initNavOrderSystem(); } catch(e) {}
   setTimeout(() => renderMemos('newest'), 100);
 });
 
@@ -3809,6 +3942,6 @@ document.addEventListener('keydown', (e) => {
 </script>
 
 
-<!-- 최종 생성일자: 2026-05-13 21:43:38 KST -->
+<!-- 최종 생성일자: 2026-05-13 22:33:11 KST / web-test 전용 / Firebase 경로: users/{UID}/sites/web-test -->
 </body>
 </html>
