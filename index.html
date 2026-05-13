@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<!-- web-test Firebase 수정본 Ver13: index.html 코드 한 줄 해설 문서를 외부 파일 없이 index.html 내부로 통합, Firestore 저장 경로 users/{uid}/sites/web-test 유지, 생성 2026-05-13 21:25:40 KST -->
+<!-- web-test Firebase 수정본 Ver14: 상단 메뉴 순서를 사용자가 직접 변경할 수 있는 메뉴 설정 기능 추가, Firestore 저장 경로 users/{uid}/sites/web-test 유지, 생성 2026-05-13 21:43:38 KST -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 블로그</title>
@@ -1109,9 +1109,9 @@
     </div>
   </div>
 
-  <ul class="nav-menu">
-    <!-- 📚 문서 폴더: 블로그의 메인 보관 메뉴로 최상단 배치 -->
-    <div class="nav-folder nav-docs-folder">
+  <ul class="nav-menu" id="nav-menu">
+    <!-- 📚 문서 폴더: 블로그의 메인 보관 메뉴로 최상단 배치, 사용자가 순서 변경 가능 -->
+    <div class="nav-folder nav-docs-folder" data-menu-key="docs">
       <button class="nav-folder-btn active" data-section="docs" onclick="navClick(this, 'docs'); toggleFolder(this);">
         <span class="nav-icon">📚</span>
         <span>문서</span>
@@ -1142,15 +1142,15 @@
       </div>
     </div>
 
-    <button class="nav-item" data-section="home" onclick="navClick(this, 'home')">
+    <button class="nav-item" data-menu-key="home" data-section="home" onclick="navClick(this, 'home')">
       <span class="nav-icon">🏠</span><span>홈</span>
     </button>
-    <button class="nav-item" data-section="blog" onclick="navClick(this, 'blog')">
+    <button class="nav-item" data-menu-key="blog" data-section="blog" onclick="navClick(this, 'blog')">
       <span class="nav-icon">📚</span><span>블로그</span>
     </button>
 
     <!-- 📖 일상기록 폴더 -->
-    <div class="nav-folder">
+    <div class="nav-folder" data-menu-key="daily">
       <button class="nav-folder-btn" onclick="toggleFolder(this)">
         <span class="nav-icon">📖</span>
         <span>일상기록</span>
@@ -1166,16 +1166,20 @@
       </div>
     </div>
 
-    <button class="nav-item" data-section="sync" onclick="navClick(this, 'sync')">
+    <button class="nav-item" data-menu-key="sync" data-section="sync" onclick="navClick(this, 'sync')">
       <span class="nav-icon">☁️</span><span>동기화</span>
     </button>
 
-    <button class="nav-item" data-section="stats" onclick="navClick(this, 'stats')">
+    <button class="nav-item" data-menu-key="stats" data-section="stats" onclick="navClick(this, 'stats')">
       <span class="nav-icon">📊</span><span>통계</span>
     </button>
 
-    <button class="nav-item" data-section="about" onclick="navClick(this, 'about')">
+    <button class="nav-item" data-menu-key="about" data-section="about" onclick="navClick(this, 'about')">
       <span class="nav-icon">👤</span><span>소개</span>
+    </button>
+
+    <button class="nav-item" data-menu-key="menu-settings" data-section="menu-settings" onclick="navClick(this, 'menu-settings')">
+      <span class="nav-icon">⚙️</span><span>메뉴설정</span>
     </button>
   </ul>
 </aside>
@@ -1565,6 +1569,29 @@
     </div>
   </section>
 
+  <!-- ⚙️ 메뉴 설정 -->
+  <section id="menu-settings" class="section">
+    <h1 class="section-title">⚙️ 메뉴 설정</h1>
+    <p class="section-desc">상단 메뉴 순서를 원하는 대로 바꿀 수 있습니다. 문서 보관함을 맨 앞에 두거나, 자주 쓰는 메뉴를 앞으로 옮겨보세요.</p>
+
+    <div style="background:#fff; border:1px solid #e8d9c7; border-radius:18px; padding:24px; margin-top:24px; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
+      <h2 style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:10px;">🔀 상단 메뉴 순서 변경</h2>
+      <p style="font-size:13px; color:var(--text-dim); line-height:1.8; margin-bottom:16px;">
+        아래 목록에서 <strong>위/아래</strong> 버튼을 누르면 상단 메뉴 순서가 바로 바뀝니다. PC에서는 항목을 잡고 끌어서 옮기는 것도 가능합니다.<br>
+        변경 내용은 이 브라우저에 자동 저장됩니다. 다른 기기에도 적용하려면 <strong>☁️ 동기화 → Firebase에 저장</strong>을 눌러주세요.
+      </p>
+      <div id="menu-order-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:16px;">
+        <button onclick="resetNavOrder()" style="background:#f0f0f0; color:var(--text); border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">↩️ 기본 순서로 복원</button>
+        <button onclick="navClick(null, 'sync')" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">☁️ 동기화로 이동</button>
+      </div>
+    </div>
+
+    <div style="background:#fff8e6; border:1px solid #f0d899; border-radius:18px; padding:18px; margin-top:18px; color:#4a3b16; line-height:1.8; font-size:13px;">
+      <strong>초보자 안내:</strong> 이 기능은 HTML 코드를 직접 수정하지 않아도 메뉴 순서를 바꿀 수 있게 만든 기능입니다. 저장되는 값은 <code>webtest_nav_order</code>이며, Firebase 저장 경로는 기존과 똑같이 <code>users / UID / sites / web-test</code>를 유지합니다.
+    </div>
+  </section>
+
   <!-- 📊 통계 -->
   <section id="stats" class="section">
     <h1 class="section-title">📊 통계</h1>
@@ -1615,7 +1642,7 @@
   </section>
 
 
-  <div id="final-generated-date" style="text-align:center; color:#8a8178; font-size:12px; padding:24px 12px 32px;">최종 생성일자: 2026-05-13 21:03:07 KST</div>
+  <div id="final-generated-date" style="text-align:center; color:#8a8178; font-size:12px; padding:24px 12px 32px;">최종 생성일자: 2026-05-13 21:43:38 KST</div>
 </main>
 
 
@@ -1793,7 +1820,7 @@ function escapeHtml(value) {
 // ── NAVIGATION ──
 function navClick(el, section) {
   // 🔐 로그인 확인: 홈/소개/문서/동기화/통계는 로그인 전에도 열 수 있습니다.
-  const publicSections = ['home', 'about', 'docs', 'codeguide', 'v1docs', 'v2docs', 'sync', 'stats'];
+  const publicSections = ['home', 'about', 'docs', 'codeguide', 'v1docs', 'v2docs', 'sync', 'stats', 'menu-settings'];
   if (!isAdminLoggedIn && !publicSections.includes(section)) {
     alert('❌ Firebase 로그인 후 사용할 수 있습니다.\n\n상단 ☁️ 동기화 메뉴에서 로그인하세요.');
     navClick(null, 'sync');
@@ -1870,6 +1897,137 @@ function closeAllFolders() {
       btn.querySelector('.nav-folder-toggle')?.classList.remove('open');
     }
   });
+}
+
+
+// ── ⚙️ 상단 메뉴 순서 변경 기능 ──
+const NAV_ORDER_KEY = 'webtest_nav_order';
+const DEFAULT_NAV_ORDER = ['docs', 'home', 'blog', 'daily', 'sync', 'stats', 'about', 'menu-settings'];
+const NAV_LABELS = {
+  docs: { icon: '📚', label: '문서' },
+  home: { icon: '🏠', label: '홈' },
+  blog: { icon: '📚', label: '블로그' },
+  daily: { icon: '📖', label: '일상기록' },
+  sync: { icon: '☁️', label: '동기화' },
+  stats: { icon: '📊', label: '통계' },
+  about: { icon: '👤', label: '소개' },
+  'menu-settings': { icon: '⚙️', label: '메뉴설정' }
+};
+
+function normalizeNavOrder(order) {
+  const clean = Array.isArray(order) ? order.filter(key => DEFAULT_NAV_ORDER.includes(key)) : [];
+  const merged = [...clean];
+  DEFAULT_NAV_ORDER.forEach(key => {
+    if (!merged.includes(key)) merged.push(key);
+  });
+  return merged;
+}
+
+function getSavedNavOrder() {
+  try {
+    return normalizeNavOrder(JSON.parse(localStorage.getItem(NAV_ORDER_KEY) || '[]'));
+  } catch {
+    return [...DEFAULT_NAV_ORDER];
+  }
+}
+
+function saveNavOrder(order) {
+  localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(normalizeNavOrder(order)));
+}
+
+function getCurrentNavOrder() {
+  const nav = document.getElementById('nav-menu');
+  if (!nav) return getSavedNavOrder();
+  const keys = [...nav.children].map(el => el.dataset?.menuKey).filter(Boolean);
+  return normalizeNavOrder(keys.length ? keys : getSavedNavOrder());
+}
+
+function applyNavOrder(order = getSavedNavOrder()) {
+  const nav = document.getElementById('nav-menu');
+  if (!nav) return;
+  const normalized = normalizeNavOrder(order);
+  const items = {};
+  [...nav.children].forEach(el => {
+    const key = el.dataset?.menuKey;
+    if (key) items[key] = el;
+  });
+  normalized.forEach(key => {
+    if (items[key]) nav.appendChild(items[key]);
+  });
+  saveNavOrder(normalized);
+}
+
+function renderNavOrderSettings() {
+  const box = document.getElementById('menu-order-list');
+  if (!box) return;
+  const order = getCurrentNavOrder();
+  box.innerHTML = order.map((key, idx) => {
+    const item = NAV_LABELS[key] || { icon:'▫️', label:key };
+    return `
+      <div class="menu-order-row" draggable="true" ondragstart="menuOrderDragStart(event, '${key}')" ondragover="menuOrderDragOver(event)" ondrop="menuOrderDrop(event, '${key}')" style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px; border:1px solid #eee0d1; border-radius:14px; background:#fffaf5;">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <span style="font-size:16px; color:#9c8b7c; cursor:grab;">☰</span>
+          <span style="display:inline-flex; width:30px; height:30px; border-radius:10px; align-items:center; justify-content:center; background:white; border:1px solid #eadbcb; font-size:15px;">${item.icon}</span>
+          <span style="font-size:14px; font-weight:800; color:var(--text);">${idx + 1}. ${item.label}</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-dim);">상단 메뉴 ${idx + 1}번째</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+          <button onclick="moveNavMenuItem('${key}', 'up')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === 0 ? 'disabled' : ''}>⬆️ 위</button>
+          <button onclick="moveNavMenuItem('${key}', 'down')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === order.length - 1 ? 'disabled' : ''}>⬇️ 아래</button>
+          <button onclick="moveNavMenuItem('${key}', 'top')" style="padding:7px 9px; border:none; border-radius:8px; background:#e8d9c7; cursor:pointer; font-family:inherit; font-size:12px;">맨앞</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function moveNavMenuItem(key, direction) {
+  const order = getCurrentNavOrder();
+  const idx = order.indexOf(key);
+  if (idx < 0) return;
+  if (direction === 'up' && idx > 0) {
+    [order[idx - 1], order[idx]] = [order[idx], order[idx - 1]];
+  } else if (direction === 'down' && idx < order.length - 1) {
+    [order[idx + 1], order[idx]] = [order[idx], order[idx + 1]];
+  } else if (direction === 'top') {
+    order.splice(idx, 1);
+    order.unshift(key);
+  }
+  saveNavOrder(order);
+  applyNavOrder(order);
+  renderNavOrderSettings();
+  showToast('✅ 메뉴 순서가 저장되었습니다');
+}
+
+let draggingNavKey = null;
+function menuOrderDragStart(event, key) {
+  draggingNavKey = key;
+  event.dataTransfer?.setData('text/plain', key);
+}
+function menuOrderDragOver(event) {
+  event.preventDefault();
+}
+function menuOrderDrop(event, targetKey) {
+  event.preventDefault();
+  const fromKey = event.dataTransfer?.getData('text/plain') || draggingNavKey;
+  if (!fromKey || fromKey === targetKey) return;
+  const order = getCurrentNavOrder();
+  const fromIdx = order.indexOf(fromKey);
+  const toIdx = order.indexOf(targetKey);
+  if (fromIdx < 0 || toIdx < 0) return;
+  order.splice(fromIdx, 1);
+  order.splice(toIdx, 0, fromKey);
+  saveNavOrder(order);
+  applyNavOrder(order);
+  renderNavOrderSettings();
+  showToast('✅ 드래그한 메뉴 순서가 저장되었습니다');
+}
+
+function resetNavOrder() {
+  if (!confirm('상단 메뉴 순서를 기본값으로 되돌릴까요?')) return;
+  saveNavOrder(DEFAULT_NAV_ORDER);
+  applyNavOrder(DEFAULT_NAV_ORDER);
+  renderNavOrderSettings();
+  showToast('↩️ 메뉴 순서가 기본값으로 복원되었습니다');
 }
 
 // 외부 클릭시 드롭다운 닫기
@@ -2649,6 +2807,7 @@ function renderMemos(order = 'newest') {
 // 페이지 로드 시 메모 표시
 document.addEventListener('DOMContentLoaded', () => {
   if (document.readyState === 'loading') return;
+  try { applyNavOrder(); renderNavOrderSettings(); } catch(e) {}
   setTimeout(() => renderMemos('newest'), 100);
 });
 
@@ -3133,8 +3292,11 @@ window.addEventListener('load', () => {
     if (d.결제카드) localStorage.setItem('blog_cards', JSON.stringify(d.결제카드));
     if (d.거래내역) localStorage.setItem('blog_transactions', JSON.stringify(d.거래내역));
     if (d.방문자) localStorage.setItem('visitor_count', d.방문자);
+    if (d.메뉴순서) saveNavOrder(d.메뉴순서);
     console.log('✅ 내장 데이터 복원 완료!');
   }
+
+  try { applyNavOrder(); renderNavOrderSettings(); } catch(e) {}
 
   incrementVisitorCount();
   updateVisitorDisplay();
@@ -3150,7 +3312,7 @@ window.addEventListener('load', () => {
 const DATA_STORAGE_KEYS = [
   'blog_ledger', 'blog_memos', 'blog_posts',
   'card_config', 'blog_cards', 'blog_transactions',
-  'visitor_count'
+  'visitor_count', 'webtest_nav_order'
 ];
 
 function safeJsonParse(value, fallback) {
@@ -3182,7 +3344,8 @@ function collectAllLocalData() {
       블로그: safeJsonParse(localStorage.getItem('blog_posts'), []),
       결제카드: cards,
       거래내역: safeJsonParse(localStorage.getItem('blog_transactions'), []),
-      방문자: parseInt(localStorage.getItem('visitor_count') || '0', 10)
+      방문자: parseInt(localStorage.getItem('visitor_count') || '0', 10),
+      메뉴순서: getSavedNavOrder()
     },
     raw
   };
@@ -3202,6 +3365,11 @@ function applyAllLocalData(payload, mode = 'replace') {
     }
     if (data.거래내역) localStorage.setItem('blog_transactions', JSON.stringify(data.거래내역));
     if (typeof data.방문자 !== 'undefined') localStorage.setItem('visitor_count', String(data.방문자));
+    if (data.메뉴순서) {
+      saveNavOrder(data.메뉴순서);
+      applyNavOrder(data.메뉴순서);
+      renderNavOrderSettings();
+    }
   } else {
     loadImportedData({ data });
     return;
@@ -3222,6 +3390,7 @@ function refreshAllViews() {
   try { renderPosts(); } catch(e) {}
   try { updateVisitorDisplay(); } catch(e) {}
   try { updateStatsPanel(); } catch(e) {}
+  try { applyNavOrder(); renderNavOrderSettings(); } catch(e) {}
 }
 
 function showInlineFirebaseError(message) {
@@ -3640,6 +3809,6 @@ document.addEventListener('keydown', (e) => {
 </script>
 
 
-<!-- 최종 생성일자: 2026-05-13 21:25:40 KST -->
+<!-- 최종 생성일자: 2026-05-13 21:43:38 KST -->
 </body>
 </html>
