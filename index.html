@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<!-- web-test Firebase 수정본: Firestore 저장 경로 users/{uid}/sites/web-test, 생성 2026-05-13 18:00:39 KST -->
+<!-- web-test Firebase 수정본 Ver8: 수정 기능 추가, 아이콘 축소, 위치서비스 분리, Firestore 저장 경로 users/{uid}/sites/web-test, 생성 2026-05-13 19:00:13 KST -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 블로그</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -802,6 +800,52 @@
       width: 100% !important;
     }
   }
+
+
+  /* ── Ver8: 보기 편한 아이콘/카드 크기 조정 ── */
+  .compact-action-row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .small-action-btn {
+    border:none; border-radius:8px; padding:6px 10px; font-size:12px;
+    font-family:inherit; font-weight:700; cursor:pointer; line-height:1.2;
+  }
+  .small-action-btn.edit { background:#f1efe9; color:var(--text); }
+  .small-action-btn.delete { background:#fff0f0; color:#d94a4a; }
+  .small-action-btn.cancel { background:#f4f4f4; color:var(--text-dim); border:1px solid var(--border); }
+  .small-action-btn:hover { filter:brightness(0.97); }
+  .posts-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+  .post-card { border-radius:14px; cursor:default; }
+  .post-card-click { cursor:pointer; }
+  .post-thumb { height:108px; font-size:34px; }
+  .post-body { padding:16px; }
+  .post-actions { display:flex; gap:6px; margin-top:12px; border-top:1px solid var(--border); padding-top:10px; }
+  .memo-card { background:white; border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px; box-shadow:0 4px 12px rgba(0,0,0,0.03); }
+  .memo-title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .memo-empty-icon { font-size:32px !important; margin-bottom:12px !important; }
+  #posts-empty > div:first-child { font-size:32px !important; margin-bottom:12px !important; }
+  #read-icon { font-size:34px !important; }
+  #post-icon-preview { font-size:26px !important; }
+  .tx-actions { display:flex; gap:4px; align-items:center; }
+  .tx-edit, .tx-del {
+    border:none; border-radius:7px; cursor:pointer; font-size:12px; padding:6px 8px;
+    font-family:inherit; line-height:1; transition:all 0.2s; white-space:nowrap;
+  }
+  .tx-edit { background:#f1efe9; color:var(--text); }
+  .tx-del { background:#fff0f0; color:#d94a4a; }
+  .tx-edit:hover, .tx-del:hover { transform:translateY(-1px); }
+  .section-title { font-size:30px; }
+  .profile-avatar { width:88px; height:88px; font-size:38px; }
+  .social-link { width:34px; height:34px; font-size:14px; }
+
+  @media (max-width: 768px) {
+    .post-thumb { height:92px; font-size:30px; }
+    .post-body { padding:14px; }
+    .memo-title-row { flex-direction:column; }
+    .compact-action-row, .post-actions, .tx-actions { width:100%; }
+    .small-action-btn, .tx-edit, .tx-del { flex:1; }
+    .tx-item { flex-wrap:wrap; }
+    .tx-amount { margin-left:auto; }
+  }
+
 </style>
 </head>
 <body>
@@ -872,23 +916,6 @@
       </div>
     </div>
 
-    <!-- 📍 위치 서비스 폴더 -->
-    <div class="nav-folder">
-      <button class="nav-folder-btn" onclick="toggleFolder(this)">
-        <span class="nav-icon">📍</span>
-        <span>위치 서비스</span>
-        <span class="nav-folder-toggle">▼</span>
-      </button>
-      <div class="nav-submenu">
-        <button class="nav-subitem" onclick="navClick(this, 'navigation'); closeAllFolders();">
-          <span class="nav-icon">🗺️</span><span>네비게이션</span>
-        </button>
-        <button class="nav-subitem" onclick="navClick(this, 'gps'); closeAllFolders();">
-          <span class="nav-icon">📡</span><span>GPS 트래커</span>
-        </button>
-      </div>
-    </div>
-
     <button class="nav-item" data-section="sync" onclick="navClick(this, 'sync')">
       <span class="nav-icon">☁️</span><span>동기화</span>
     </button>
@@ -953,9 +980,9 @@
         </div>
         <div style="background:linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius:12px; padding:24px; color:white;">
           <div style="font-size:28px; margin-bottom:12px;">📝</div>
-          <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">변경사항 (Ver7)</h3>
-          <p style="font-size:13px; opacity:0.9; margin-bottom:16px;">로그인 분리, 하단 설정 제거, 통계 섹션 추가</p>
-          <button onclick="alert('Ver7: Firebase 로그인은 ☁️ 동기화로 이동, 관리자 비밀번호 패널은 제거, 📊 통계 섹션을 추가했습니다.');" style="background:rgba(255,255,255,0.25); color:white; border:1px solid rgba(255,255,255,0.5); border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">변경사항 보기</button>
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">변경사항 (Ver8)</h3>
+          <p style="font-size:13px; opacity:0.9; margin-bottom:16px;">수정 기능 추가, 아이콘 축소, 위치서비스 분리</p>
+          <button onclick="alert('Ver8: 메모·블로그·가계부 수정 기능을 보강하고, 큰 아이콘을 줄였으며, 위치서비스는 별도 보관 파일로 분리했습니다.');" style="background:rgba(255,255,255,0.25); color:white; border:1px solid rgba(255,255,255,0.5); border-radius:8px; padding:10px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">변경사항 보기</button>
         </div>
       </div>
     </div>
@@ -1067,7 +1094,7 @@
     <div class="ledger-grid">
       <!-- FORM -->
       <div class="form-card">
-        <div class="form-title">거래 추가</div>
+        <div class="form-title" id="tx-form-title">거래 추가</div>
 
         <div class="type-toggle">
           <button class="type-btn active" id="btn-income" onclick="setType('income')">+ 수입</button>
@@ -1102,7 +1129,11 @@
           <select class="form-select" id="tx-payment"></select>
         </div>
 
-        <button class="btn-add" onclick="addTransaction()">+ 추가</button>
+        <input type="hidden" id="tx-edit-id" value="">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-add" id="tx-submit-btn" onclick="addTransaction()" style="flex:2;">+ 추가</button>
+          <button class="small-action-btn cancel" id="tx-cancel-edit-btn" onclick="cancelTxEdit()" style="display:none; flex:1; padding:12px;">수정 취소</button>
+        </div>
       </div>
 
       <!-- LIST -->
@@ -1132,215 +1163,6 @@
     </div>
   </section>
 
-  <!-- NAVIGATION -->
-  <section id="navigation" class="section">
-    <h1 class="section-title">🗺️ 네비게이션</h1>
-    <p class="section-desc">목적지를 선택하면 구글 지도에 경로가 표시됩니다.</p>
-
-    <div style="display: grid; grid-template-columns: 300px 1fr; gap: 24px; margin-top: 24px; align-items: start;">
-
-      <!-- 좌측 패널 -->
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-
-        <!-- 자주 가는 곳 목록 -->
-        <div class="form-card">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-            <div class="form-title" style="margin-bottom: 0;">자주 가는 곳</div>
-            <button onclick="openPlaceModal()" style="background: var(--accent); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;">+ 추가</button>
-          </div>
-          <div id="places-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-
-        <!-- 선택된 목적지 정보 -->
-        <div class="form-card" id="dest-info-card" style="display: none;">
-          <div class="form-title" style="margin-bottom: 10px;">경로 정보</div>
-          <div style="font-size: 15px; font-weight: 700; margin-bottom: 12px;" id="navDestName">-</div>
-          <div style="display: flex; gap: 20px; margin-bottom: 14px;">
-            <div>
-              <div style="font-size: 20px; color: var(--accent); font-weight: 700;" id="navDist">-</div>
-              <div style="font-size: 11px; color: var(--text-dim);">직선 거리</div>
-            </div>
-            <div>
-              <div style="font-size: 20px; font-weight: 600;" id="navTime">-</div>
-              <div style="font-size: 11px; color: var(--text-dim);">예상 시간</div>
-            </div>
-          </div>
-          <div id="navGuidance"></div>
-        </div>
-      </div>
-
-      <!-- 지도 (Leaflet + OpenStreetMap) -->
-      <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); height: 520px; position: sticky; top: 40px; background:#e8e8e8;">
-        <div id="leaflet-map" style="width:100%;height:100%;"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 장소 추가/수정 모달 -->
-  <div id="place-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:white; border-radius:16px; padding:28px; width:380px; max-width:90vw; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-      <div style="font-size:18px; font-weight:700; margin-bottom:20px;" id="modal-title">장소 추가</div>
-
-      <div class="form-group">
-        <label class="form-label">아이콘</label>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <span id="icon-preview" style="font-size:28px; cursor:pointer; padding:6px; border:2px solid var(--accent); border-radius:8px;">🏠</span>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🏠</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">💼</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🏥</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">☕</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🏫</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🏪</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🏋️</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🛒</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">🍽️</span>
-            <span style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px;" onclick="pickIcon(this)">⛽</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">장소 이름</label>
-        <input type="text" class="form-input" id="place-name" placeholder="예: 집, 회사, 단골카페">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">주소 검색</label>
-        <div style="display:flex; gap:8px;">
-          <input type="text" class="form-input" id="place-address" placeholder="주소 입력 후 검색" style="flex:1;">
-          <button onclick="searchAddress()" style="background:var(--accent);color:white;border:none;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">검색</button>
-        </div>
-        <div id="addr-result" style="margin-top:8px; font-size:12px; color:var(--text-dim);"></div>
-      </div>
-
-      <input type="hidden" id="place-lat">
-      <input type="hidden" id="place-lng">
-      <input type="hidden" id="place-edit-idx" value="-1">
-
-      <div style="display:flex; gap:10px; margin-top:20px;">
-        <button onclick="closePlaceModal()" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-family:inherit;font-size:14px;">취소</button>
-        <button onclick="savePlace()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;">저장</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- V1 DOCS -->
-  <section id="v1docs" class="section">
-    <h1 class="section-title">📋 V1 매뉴얼</h1>
-    <p class="section-desc">키움 자동매매 V1 — 가이드·코드·조건식 문서 모음</p>
-    
-    <!-- 상단 탭 버튼들 -->
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; padding:12px; background:white; border:1px solid var(--border); border-radius:12px; overflow-x:auto;">
-      <button id="v1doc-btn-0" class="v1doc-btn" onclick="showV1Doc(0)" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:700;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;font-size:13px;font-family:inherit;">📘 통합본</button>
-      <button id="v1doc-btn-1" class="v1doc-btn" onclick="showV1Doc(1)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">📗 기본형</button>
-      <button id="v1doc-btn-2" class="v1doc-btn" onclick="showV1Doc(2)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">📗 GPT형</button>
-      <button id="v1doc-btn-3" class="v1doc-btn" onclick="showV1Doc(3)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">📗 Claude형</button>
-      <button id="v1doc-btn-4" class="v1doc-btn" onclick="showV1Doc(4)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">💻 기본형</button>
-      <button id="v1doc-btn-5" class="v1doc-btn" onclick="showV1Doc(5)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">💻 GPT형</button>
-      <button id="v1doc-btn-6" class="v1doc-btn" onclick="showV1Doc(6)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">💻 Claude형</button>
-      <button id="v1doc-btn-7" class="v1doc-btn" onclick="showV1Doc(7)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">🔍 급등초입</button>
-      <button id="v1doc-btn-8" class="v1doc-btn" onclick="showV1Doc(8)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">🔍 눌림목반등</button>
-      <button id="v1doc-btn-9" class="v1doc-btn" onclick="showV1Doc(9)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">🔍 MACD</button>
-      <button id="v1doc-btn-10" class="v1doc-btn" onclick="showV1Doc(10)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">🔍 모멘텀</button>
-      <button id="v1doc-btn-11" class="v1doc-btn" onclick="showV1Doc(11)" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit;">🔍 외국인</button>
-    </div>
-    
-    <!-- 본 컨텐츠 -->
-    <div style="margin-top:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border);height:calc(100vh - 140px);min-height:560px;background:white;">
-      <iframe id="v1doc-viewer" style="width:100%;height:100%;border:none;background:white;display:block;"></iframe>
-    </div>
-  </section>
-
-  <!-- V2 DOCS -->
-  <section id="v2docs" class="section">
-    <h1 class="section-title">📋 V2 메뉴얼</h1>
-    <p class="section-desc">키움 자동매매 V2 — 준비 중입니다</p>
-    
-    <div style="background:linear-gradient(135deg,#f0f0f0 0%,#e8e8e8 100%); border-radius:14px; padding:48px 24px; text-align:center; margin-top:40px;">
-      <div style="font-size:64px; margin-bottom:16px;">🔧</div>
-      <h2 style="font-size:20px; font-weight:700; color:#666; margin-bottom:8px;">V2 메뉴얼 준비 중</h2>
-      <p style="font-size:14px; color:#999; margin-bottom:24px;">V2 매뉴얼은 곧 공개될 예정입니다.</p>
-      <button onclick="navClick(null, 'docs')" style="background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border:none; border-radius:8px; padding:12px 24px; font-weight:600; cursor:pointer; font-family:inherit; font-size:14px;">← 문서로 돌아가기</button>
-    </div>
-  </section>
-
-  <!-- GPS TRACKER -->
-  <section id="gps" class="section">
-    <h1 class="section-title">📡 GPS 트래커</h1>
-    <p class="section-desc">실시간 위치를 추적하고 이동 경로를 기록합니다.</p>
-
-    <div style="display:grid; grid-template-columns:260px 1fr; gap:24px; margin-top:24px; align-items:start;">
-
-      <!-- 좌측 컨트롤 패널 -->
-      <div style="display:flex; flex-direction:column; gap:16px;">
-
-        <!-- 상태 카드 -->
-        <div class="form-card">
-          <div class="form-title" style="margin-bottom:14px;">추적 상태</div>
-          <div id="gps-status-badge" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#f0f0f0;border-radius:100px;font-size:13px;font-weight:600;margin-bottom:16px;">
-            <span id="gps-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;"></span>
-            <span id="gps-status-text">대기 중</span>
-          </div>
-
-          <button id="gps-toggle-btn" onclick="toggleGPS()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:10px;">
-            📡 추적 시작
-          </button>
-          <button onclick="clearTrack()" style="width:100%;padding:10px;background:#f5f3f0;border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-dim);">
-            🗑️ 경로 초기화
-          </button>
-        </div>
-
-        <!-- 현재 위치 정보 -->
-        <div class="form-card">
-          <div class="form-title" style="margin-bottom:14px;">현재 위치</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div style="background:#fafaf8;border-radius:10px;padding:12px;text-align:center;">
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">위도</div>
-              <div style="font-size:13px;font-weight:700;" id="gps-lat">-</div>
-            </div>
-            <div style="background:#fafaf8;border-radius:10px;padding:12px;text-align:center;">
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">경도</div>
-              <div style="font-size:13px;font-weight:700;" id="gps-lng">-</div>
-            </div>
-            <div style="background:#fafaf8;border-radius:10px;padding:12px;text-align:center;">
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">속도</div>
-              <div style="font-size:16px;font-weight:700;color:var(--accent);" id="gps-speed">- km/h</div>
-            </div>
-            <div style="background:#fafaf8;border-radius:10px;padding:12px;text-align:center;">
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">정확도</div>
-              <div style="font-size:16px;font-weight:700;" id="gps-accuracy">- m</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 트랙 통계 -->
-        <div class="form-card">
-          <div class="form-title" style="margin-bottom:14px;">이동 통계</div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-              <span style="font-size:13px;color:var(--text-dim);">총 거리</span>
-              <span style="font-weight:700;color:var(--accent);" id="gps-total-dist">0.00 km</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-              <span style="font-size:13px;color:var(--text-dim);">경유 지점</span>
-              <span style="font-weight:700;" id="gps-points">0 개</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
-              <span style="font-size:13px;color:var(--text-dim);">추적 시간</span>
-              <span style="font-weight:700;" id="gps-duration">00:00:00</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 지도 -->
-      <div style="border-radius:12px;overflow:hidden;border:1px solid var(--border);height:580px;position:sticky;top:40px;">
-        <div id="gps-map" style="width:100%;height:100%;"></div>
-      </div>
-    </div>
-  </section>
-
   <!-- ABOUT -->
   <!-- 📝 메모/노트 섹션 -->
   <section id="memo" class="section">
@@ -1357,7 +1179,11 @@
         <label class="form-label">메모 내용</label>
         <textarea id="memo-content" class="form-input" placeholder="내용을 입력하세요" style="resize:vertical; min-height:100px; font-family:inherit;"></textarea>
       </div>
-      <button onclick="addMemo()" class="btn-add">➕ 메모 추가</button>
+      <input type="hidden" id="memo-edit-id" value="">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button onclick="addMemo()" id="memo-save-btn" class="btn-add" style="flex:2;">➕ 메모 추가</button>
+        <button onclick="cancelMemoEdit()" id="memo-cancel-btn" class="small-action-btn cancel" style="display:none; flex:1; padding:12px;">수정 취소</button>
+      </div>
     </div>
 
     <!-- 정렬 버튼 -->
@@ -1471,7 +1297,7 @@
   </section>
 
 
-  <div id="final-generated-date" style="text-align:center; color:#8a8178; font-size:12px; padding:24px 12px 32px;">최종 생성일자: 2026-05-13 18:13:51 KST</div>
+  <div id="final-generated-date" style="text-align:center; color:#8a8178; font-size:12px; padding:24px 12px 32px;">최종 생성일자: 2026-05-13 19:00:13 KST</div>
 </main>
 
 
@@ -1637,6 +1463,15 @@
 // 🔐 로그인 상태 추적 - sessionStorage로 유지 (새로고침 OK, 창 닫으면 초기화)
 let isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ── NAVIGATION ──
 function navClick(el, section) {
   // 🔐 로그인 확인: 홈/소개/문서/동기화/통계는 로그인 전에도 열 수 있습니다.
@@ -1664,8 +1499,6 @@ function navClick(el, section) {
 
   window.scrollTo(0, 0);
   closeSidebar();
-  if (section === 'navigation') setTimeout(initMap, 50);
-  if (section === 'gps') setTimeout(initGpsMap, 50);
   if (section === 'v1docs') setTimeout(initV1Docs, 50);
 }
 
@@ -1753,6 +1586,7 @@ const CAT_ICON = {
 
 let txType = 'income';
 let filterType = 'all';
+let editingTxId = null;
 
 function getTx() {
   try { return JSON.parse(localStorage.getItem('blog_ledger') || '[]'); }
@@ -1843,7 +1677,7 @@ async function downloadAllFilesAsZip() {
     const kst = getKSTDateTime();
     const version = getNextBackupVersion();
     const timestamp = `${kst.dateStr}_${kst.timeStr}`;
-    const fileName = `ver${version}_${timestamp}`;
+    const fileName = `ver${version}_webtest_수정기능_${timestamp}`;
     
     // 현재 페이지의 HTML 가져오기
     const htmlContent = document.documentElement.outerHTML;
@@ -1897,7 +1731,7 @@ function exportAllData() {
   const sec   = String(kstTime.getSeconds()).padStart(2, '0');
 
   const version = getNextBackupVersion();
-  const verFileName = `ver${version}_${year}_${month}${day}_${hour}${min}${sec}.html`;
+  const verFileName = `ver${version}_webtest_수정기능_${year}${month}${day}_${hour}${min}${sec}.html`;
 
   // 현재 HTML (데이터 내장)
   const allData = collectAllLocalData().data;
@@ -2067,7 +1901,7 @@ function importLedgerData(event) {
   event.target.value = '';
 }
 
-// ── ADD ──
+// ── ADD / EDIT ──
 function addTransaction() {
   const date   = document.getElementById('tx-date').value;
   const desc   = document.getElementById('tx-desc').value.trim();
@@ -2081,6 +1915,18 @@ function addTransaction() {
   }
 
   const list = getTx();
+  if (editingTxId) {
+    const idx = list.findIndex(t => Number(t.id) === Number(editingTxId));
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], date, desc, amount, type: txType, cat, pay };
+      saveTx(list);
+      cancelTxEdit(false);
+      renderList();
+      showToast('✅ 거래 내역이 수정됐습니다');
+      return;
+    }
+  }
+
   list.unshift({ id: Date.now(), date, desc, amount, type: txType, cat, pay });
   saveTx(list);
   document.getElementById('tx-desc').value = '';
@@ -2089,9 +1935,40 @@ function addTransaction() {
   showToast(txType === 'income' ? '✅ 수입 추가' : '✅ 지출 추가');
 }
 
+function editTx(id) {
+  const tx = getTx().find(t => Number(t.id) === Number(id));
+  if (!tx) return;
+  editingTxId = Number(id);
+  document.getElementById('tx-edit-id').value = id;
+  document.getElementById('tx-form-title').textContent = '거래 수정';
+  document.getElementById('tx-submit-btn').textContent = '✅ 수정 저장';
+  document.getElementById('tx-cancel-edit-btn').style.display = 'block';
+  setType(tx.type || 'income');
+  document.getElementById('tx-date').value = tx.date || '';
+  document.getElementById('tx-desc').value = tx.desc || '';
+  document.getElementById('tx-amount').value = tx.amount || '';
+  document.getElementById('tx-category').value = tx.cat || CATS[txType][0];
+  buildPaymentSelect();
+  document.getElementById('tx-payment').value = tx.pay || '현금';
+  document.getElementById('tx-date').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function cancelTxEdit(clearToast = true) {
+  editingTxId = null;
+  document.getElementById('tx-edit-id').value = '';
+  document.getElementById('tx-form-title').textContent = '거래 추가';
+  document.getElementById('tx-submit-btn').textContent = '+ 추가';
+  document.getElementById('tx-cancel-edit-btn').style.display = 'none';
+  document.getElementById('tx-desc').value = '';
+  document.getElementById('tx-amount').value = '';
+  if (clearToast) showToast('수정을 취소했습니다');
+}
+
 // ── DELETE ──
 function deleteTx(id) {
-  saveTx(getTx().filter(t => t.id !== id));
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  saveTx(getTx().filter(t => Number(t.id) !== Number(id)));
+  if (editingTxId && Number(editingTxId) === Number(id)) cancelTxEdit(false);
   renderList();
   showToast('🗑️ 삭제됨');
 }
@@ -2341,11 +2218,14 @@ function renderList() {
     <div class="tx-item">
       <div class="tx-icon">${CAT_ICON[t.cat] || '💰'}</div>
       <div class="tx-info">
-        <div class="tx-desc">${t.desc}</div>
-        <div class="tx-meta">${t.date} · ${t.cat} · ${t.pay.replace(/^(신용:|직불:)/,'')}</div>
+        <div class="tx-desc">${escapeHtml(t.desc)}</div>
+        <div class="tx-meta">${escapeHtml(t.date)} · ${escapeHtml(t.cat)} · ${escapeHtml((t.pay || '현금').replace(/^(신용:|직불:)/,''))}</div>
       </div>
       <div class="tx-amount ${t.type}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
-      <button class="tx-del" onclick="deleteTx(${t.id})">×</button>
+      <div class="tx-actions">
+        <button class="tx-edit" onclick="editTx(${t.id})">수정</button>
+        <button class="tx-del" onclick="deleteTx(${t.id})">삭제</button>
+      </div>
     </div>
   `).join('');
 }
@@ -2737,12 +2617,32 @@ function saveMemos(memos) {
 function addMemo() {
   const title = document.getElementById('memo-title').value.trim();
   const content = document.getElementById('memo-content').value.trim();
+  const editId = document.getElementById('memo-edit-id').value;
   
   if (!title || !content) {
     alert('제목과 내용을 입력해주세요!');
     return;
   }
   
+  const memos = getMemos();
+  if (editId) {
+    const idx = memos.findIndex(m => Number(m.id) === Number(editId));
+    if (idx >= 0) {
+      memos[idx] = {
+        ...memos[idx],
+        title,
+        content,
+        updatedDate: new Date().toISOString().slice(0, 10),
+        updatedTime: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      };
+      saveMemos(memos);
+      cancelMemoEdit(false);
+      renderMemos('newest');
+      showToast('✅ 메모가 수정되었습니다');
+      return;
+    }
+  }
+
   const memo = {
     id: Date.now(),
     title,
@@ -2751,7 +2651,6 @@ function addMemo() {
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
   };
   
-  const memos = getMemos();
   memos.unshift(memo);
   saveMemos(memos);
   
@@ -2759,14 +2658,35 @@ function addMemo() {
   document.getElementById('memo-content').value = '';
   
   renderMemos('newest');
-  alert('✅ 메모가 저장되었습니다!');
+  showToast('✅ 메모가 저장되었습니다');
+}
+
+function editMemo(id) {
+  const memo = getMemos().find(m => Number(m.id) === Number(id));
+  if (!memo) return;
+  document.getElementById('memo-edit-id').value = id;
+  document.getElementById('memo-title').value = memo.title || '';
+  document.getElementById('memo-content').value = memo.content || '';
+  document.getElementById('memo-save-btn').textContent = '✅ 메모 수정 저장';
+  document.getElementById('memo-cancel-btn').style.display = 'block';
+  document.getElementById('memo-title').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function cancelMemoEdit(show = true) {
+  document.getElementById('memo-edit-id').value = '';
+  document.getElementById('memo-title').value = '';
+  document.getElementById('memo-content').value = '';
+  document.getElementById('memo-save-btn').textContent = '➕ 메모 추가';
+  document.getElementById('memo-cancel-btn').style.display = 'none';
+  if (show) showToast('메모 수정을 취소했습니다');
 }
 
 function deleteMemo(id) {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   
-  const memos = getMemos().filter(m => m.id !== id);
+  const memos = getMemos().filter(m => Number(m.id) !== Number(id));
   saveMemos(memos);
+  if (document.getElementById('memo-edit-id').value && Number(document.getElementById('memo-edit-id').value) === Number(id)) cancelMemoEdit(false);
   renderMemos('newest');
 }
 
@@ -2780,29 +2700,35 @@ function renderMemos(order = 'newest') {
   let memos = getMemos();
   
   if (order === 'newest') {
-    memos.sort((a, b) => new Date(b.date) - new Date(a.date));
+    memos.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
   } else if (order === 'oldest') {
-    memos.sort((a, b) => new Date(a.date) - new Date(b.date));
+    memos.sort((a, b) => Number(a.id || 0) - Number(b.id || 0));
   } else if (order === 'title') {
-    memos.sort((a, b) => a.title.localeCompare(b.title));
+    memos.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
   }
   
   const container = document.getElementById('memo-list');
-  container.innerHTML = memos.map(m => `
-    <div style="background:white; border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:10px;">
-      <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+  container.innerHTML = memos.map(m => {
+    const updated = m.updatedDate ? `<div style="font-size:11px; color:#9a8f84; margin-top:2px;">수정: ${escapeHtml(m.updatedDate)} ${escapeHtml(m.updatedTime || '')}</div>` : '';
+    return `
+    <div class="memo-card">
+      <div class="memo-title-row">
         <div>
-          <div style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">${m.title}</div>
-          <div style="font-size:12px; color:var(--text-dim);">📅 ${m.date} ${m.time}</div>
+          <div style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">${escapeHtml(m.title)}</div>
+          <div style="font-size:12px; color:var(--text-dim);">📅 ${escapeHtml(m.date)} ${escapeHtml(m.time || '')}</div>
+          ${updated}
         </div>
-        <button onclick="deleteMemo(${m.id})" style="background:#ff6b6b; color:white; border:none; border-radius:6px; padding:6px 10px; font-size:12px; cursor:pointer; font-family:inherit; white-space:nowrap;">🗑️ 삭제</button>
+        <div class="compact-action-row">
+          <button onclick="editMemo(${m.id})" class="small-action-btn edit">✏️ 수정</button>
+          <button onclick="deleteMemo(${m.id})" class="small-action-btn delete">🗑️ 삭제</button>
+        </div>
       </div>
-      <div style="color:var(--text); font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word;">${m.content}</div>
-    </div>
-  `).join('');
+      <div style="color:var(--text); font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word;">${escapeHtml(m.content)}</div>
+    </div>`;
+  }).join('');
   
   if (memos.length === 0) {
-    container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-dim);"><div style="font-size:48px; margin-bottom:16px;">📝</div><div style="font-size:16px; font-weight:600;">아직 메모가 없어요</div></div>';
+    container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:44px 20px; color:var(--text-dim);"><div class="memo-empty-icon">📝</div><div style="font-size:16px; font-weight:600;">아직 메모가 없어요</div></div>';
   }
 }
 
@@ -2844,13 +2770,20 @@ function renderPosts() {
   empty.style.display = 'none';
   grid.innerHTML = list.map(p => {
     const d = p.date ? p.date.replace(/-/g, '. ') : '';
-    const excerpt = p.content.length > 60 ? p.content.slice(0, 60) + '…' : p.content;
-    return `<div class="post-card" onclick="openReadModal(${p.id})">
-      <div class="post-thumb">${p.icon}</div>
-      <div class="post-body">
-        <div class="post-date">${d}</div>
-        <div class="post-title">${p.title}</div>
-        <div class="post-excerpt">${excerpt}</div>
+    const text = String(p.content || '');
+    const excerpt = text.length > 70 ? text.slice(0, 70) + '…' : text;
+    return `<div class="post-card">
+      <div class="post-card-click" onclick="openReadModal(${p.id})">
+        <div class="post-thumb">${escapeHtml(p.icon || '📚')}</div>
+        <div class="post-body">
+          <div class="post-date">${escapeHtml(d)}</div>
+          <div class="post-title">${escapeHtml(p.title)}</div>
+          <div class="post-excerpt">${escapeHtml(excerpt)}</div>
+        </div>
+      </div>
+      <div class="post-actions" style="padding:0 16px 14px;">
+        <button class="small-action-btn edit" onclick="openPostModal(${p.id})">✏️ 수정</button>
+        <button class="small-action-btn delete" onclick="deletePost(${p.id})">🗑️ 삭제</button>
       </div>
     </div>`;
   }).join('');
@@ -2933,13 +2866,18 @@ function editCurrentPost() {
   openPostModal(readingPostId);
 }
 
-function deleteCurrentPost() {
-  if (!readingPostId) return;
-  const list = getPosts().filter(p => p.id !== readingPostId);
+function deletePost(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  const list = getPosts().filter(p => Number(p.id) !== Number(id));
   savePosts(list);
   renderPosts();
-  closeReadModal();
+  if (readingPostId && Number(readingPostId) === Number(id)) closeReadModal();
   showToast('🗑️ 글이 삭제됐습니다');
+}
+
+function deleteCurrentPost() {
+  if (!readingPostId) return;
+  deletePost(readingPostId);
 }
 
 window.addEventListener('load', () => {
@@ -3377,7 +3315,6 @@ function refreshAllViews() {
   try { renderCatSummary(); } catch(e) {}
   try { renderMemos('newest'); } catch(e) {}
   try { renderPosts(); } catch(e) {}
-  try { renderPlaces(); } catch(e) {}
   try { updateVisitorDisplay(); } catch(e) {}
   try { updateStatsPanel(); } catch(e) {}
 }
@@ -3456,7 +3393,6 @@ function updateStatsPanel() {
     ['📝 메모', countJsonItems('blog_memos', [])],
     ['📰 블로그', countJsonItems('blog_posts', [])],
     ['💰 가계부', countJsonItems('blog_ledger', [])],
-    ['📍 장소', countJsonItems('nav_places', []) || countJsonItems('blog_places', [])],
     ['💳 카드 설정', countJsonItems('card_config', {}) || countJsonItems('blog_cards', {})],
     ['📦 백업목록', countJsonItems('backup_versions', [])]
   ];
@@ -3892,6 +3828,6 @@ function getGoogleToken() {
 </script>
 
 
-<!-- 최종 생성일자: 2026-05-13 18:13:51 KST -->
+<!-- 최종 생성일자: 2026-05-13 19:00:13 KST -->
 </body>
 </html>
