@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<!-- web-test Firebase 수정본: Firestore 저장 경로 users/{uid}/sites/web-test, 생성 2026-05-13 18:00:39 KST -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 블로그</title>
@@ -1403,6 +1404,8 @@
     </div>
   </section>
 
+
+  <div id="final-generated-date" style="text-align:center; color:#8a8178; font-size:12px; padding:24px 12px 32px;">최종 생성일자: 2026-05-13 18:00:39 KST</div>
 </main>
 
 
@@ -1413,7 +1416,7 @@
       <div>
         <div style="font-size:24px; margin-bottom:6px;">☁️</div>
         <h3 style="font-size:20px; font-weight:800; color:#2a2520; margin:0;">Firebase 동기화</h3>
-        <p style="font-size:13px; color:#6b6359; margin-top:6px; line-height:1.6;">이메일 로그인 후 현재 브라우저의 데이터를 Firestore에 저장하거나 다른 기기에서 불러올 수 있습니다.</p>
+        <p style="font-size:13px; color:#6b6359; margin-top:6px; line-height:1.6;">이메일 로그인 후 현재 브라우저의 데이터를 Firestore에 저장하거나 다른 기기에서 불러올 수 있습니다. 이 파일은 web-test 전용 저장 경로를 사용합니다.</p>
       </div>
       <button onclick="closeSyncPanel()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#6b6359; line-height:1;">✕</button>
     </div>
@@ -1434,7 +1437,7 @@
         <button onclick="firebaseSaveAllHandler()" style="background:linear-gradient(135deg,#4CAF50,#45a049); color:white; border:none; border-radius:10px; padding:13px; font-weight:800; cursor:pointer; font-family:inherit;">☁️ Firebase에 저장</button>
         <button onclick="firebaseLoadAllHandler()" style="background:linear-gradient(135deg,#2196F3,#1976D2); color:white; border:none; border-radius:10px; padding:13px; font-weight:800; cursor:pointer; font-family:inherit;">⬇️ Firebase에서 불러오기</button>
       </div>
-      <p style="font-size:12px; color:#6b6359; line-height:1.6; margin-top:10px;">저장 위치: <code>users / 내 UID / sync / main</code></p>
+      <p style="font-size:12px; color:#6b6359; line-height:1.6; margin-top:10px;">저장 위치: <code>users / 내 UID / sites / web-test</code></p>
     </div>
 
     <div style="background:#f8f7fb; border:1px solid #ddd6ee; border-radius:12px; padding:16px;">
@@ -1672,7 +1675,7 @@ function navClick(el, section) {
 
   // 서브아이템 활성화
   document.querySelectorAll('.nav-subitem').forEach(n => n.classList.remove('active'));
-  const subitem = el ? el.closest('.nav-subitem') : null;
+  const subitem = el.closest('.nav-subitem');
   if (subitem) subitem.classList.add('active');
 
   window.scrollTo(0, 0);
@@ -1731,6 +1734,19 @@ function closeAllFolders() {
 
 // 외부 클릭시 드롭다운 닫기
 document.addEventListener('click', (e) => {
+  // sync-panel 내부 클릭이면 무시
+  const syncPanel = document.getElementById('sync-panel');
+  const syncButton = e.target.closest('button[title="동기화"]');
+  
+  if (e.target.closest('#sync-panel') || syncButton) {
+    return;
+  }
+  
+  // sync-panel 패널 닫기
+  if (syncPanel && syncPanel.style.display === 'flex') {
+    syncPanel.style.display = 'none';
+  }
+  
   // 네비게이션 메뉴 내부 클릭이면 무시
   if (e.target.closest('.nav-folder') || e.target.closest('.nav-submenu')) {
     return;
@@ -3389,6 +3405,8 @@ function collectAllLocalData() {
 
   return {
     appName: '개인블로그',
+    siteId: 'web-test',
+    siteUrl: 'https://icookiekid.github.io/web-test/',
     schemaVersion: 2,
     savedAt: new Date().toISOString(),
     pageUrl: location.href,
@@ -3625,7 +3643,10 @@ async function saveToDrive() {
 function getGoogleToken() {
   return new Promise((resolve) => {
     const savedClientId = localStorage.getItem('google_client_id') || '';
-    const clientId = savedClientId || prompt(`Google Client ID를 입력하세요\n(Google Cloud Console에서 발급):\n\n설정 > API 및 서비스 > 사용자 인증 정보 > OAuth 2.0 클라이언트 ID`);
+    const clientId = savedClientId || prompt(`Google Client ID를 입력하세요
+(Google Cloud Console에서 발급):
+
+설정 > API 및 서비스 > 사용자 인증 정보 > OAuth 2.0 클라이언트 ID`);
     if (!clientId) {
       resolve(null);
       return;
@@ -3655,7 +3676,7 @@ function getGoogleToken() {
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getAuth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -3691,7 +3712,6 @@ function getGoogleToken() {
   // 📝 회원가입
   window.firebaseSignUp = async (email, password) => {
     try {
-      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("✅ 회원가입 성공:", userCredential.user.uid);
       return { success: true, user: userCredential.user };
@@ -3712,7 +3732,6 @@ function getGoogleToken() {
   // 🔓 로그인
   window.firebaseLogin = async (email, password) => {
     try {
-      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ 로그인 성공:", userCredential.user.uid);
       return { success: true, user: userCredential.user };
@@ -3748,13 +3767,13 @@ function getGoogleToken() {
   // 🔄 인증 상태 감시
   window.firebaseOnAuthStateChanged = (callback) => onAuthStateChanged(auth, callback);
 
-  // ☁️ 전체 앱 데이터 저장: users/{uid}/sync/main
+  // ☁️ 전체 앱 데이터 저장: users/{uid}/sites/web-test
   window.firebaseSaveAllLocalData = async (payload) => {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error('Firebase 로그인이 필요합니다');
 
-      const docRef = doc(db, 'users', user.uid, 'sync', 'main');
+      const docRef = doc(db, 'users', user.uid, 'sites', 'web-test');
       await setDoc(docRef, {
         ownerUid: user.uid,
         ownerEmail: user.email || '',
@@ -3769,13 +3788,13 @@ function getGoogleToken() {
     }
   };
 
-  // ⬇️ 전체 앱 데이터 불러오기: users/{uid}/sync/main
+  // ⬇️ 전체 앱 데이터 불러오기: users/{uid}/sites/web-test
   window.firebaseLoadAllLocalData = async () => {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error('Firebase 로그인이 필요합니다');
 
-      const docRef = doc(db, 'users', user.uid, 'sync', 'main');
+      const docRef = doc(db, 'users', user.uid, 'sites', 'web-test');
       const snap = await getDoc(docRef);
       if (!snap.exists()) {
         return { success: false, error: 'Firebase에 저장된 데이터가 아직 없습니다' };
@@ -3872,6 +3891,6 @@ function getGoogleToken() {
 </script>
 
 
-<!-- 최종 생성일자: 2026-05-12 17:22:40 KST -->
+<!-- 최종 생성일자: 2026-05-13 18:00:39 KST -->
 </body>
 </html>
