@@ -916,7 +916,7 @@
 
 
   /* ── Ver10: 문서 보관 중심 메뉴/아이콘 정리 ── */
-  .nav-docs-folder { order: -10; }
+  .nav-docs-folder { order: initial; } /* 메뉴설정 순서가 실제 화면에 반영되도록 고정 order 제거 */
   .nav-doc-menu { min-width: 230px !important; padding: 6px !important; }
   .nav-doc-menu .nav-subitem {
     padding: 9px 12px !important;
@@ -1698,8 +1698,9 @@
       </p>
       <div id="menu-order-list" style="display:flex; flex-direction:column; gap:10px;"></div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:16px;">
-        <button onclick="resetNavOrder()" style="background:#f0f0f0; color:var(--text); border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">↩️ 기본 순서로 복원</button>
-        <button onclick="navClick(null, 'sync')" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">☁️ 동기화로 이동</button>
+        <button type="button" onclick="saveCurrentNavOrder()" style="background:linear-gradient(135deg,#4CAF50,#45a049); color:white; border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">💾 현재 순서 저장</button>
+        <button type="button" onclick="resetNavOrder()" style="background:#f0f0f0; color:var(--text); border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">↩️ 기본 순서로 복원</button>
+        <button type="button" onclick="navClick(null, 'sync')" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer; font-family:inherit;">☁️ 동기화로 이동</button>
       </div>
     </div>
 
@@ -2017,6 +2018,8 @@ function closeAllFolders() {
 
 
 // ── ⚙️ 상단 메뉴 순서 변경 기능 ──
+// 핵심 수정: CSS order 때문에 '문서' 메뉴가 항상 첫 번째로 보이던 문제를 제거하고,
+// localStorage / 화면 DOM / 메뉴설정 목록이 모두 같은 순서로 움직이도록 한 곳에서 관리합니다.
 const NAV_ORDER_KEY = 'webtest_nav_order';
 const DEFAULT_NAV_ORDER = ['docs', 'home', 'blog', 'daily', 'sync', 'stats', 'about', 'menu-settings'];
 const NAV_LABELS = {
@@ -2029,10 +2032,14 @@ const NAV_LABELS = {
   about: { icon: '👤', label: '소개' },
   'menu-settings': { icon: '⚙️', label: '메뉴설정' }
 };
+let currentNavOrder = null;
 
 function normalizeNavOrder(order) {
   const clean = Array.isArray(order) ? order.filter(key => DEFAULT_NAV_ORDER.includes(key)) : [];
-  const merged = [...clean];
+  const merged = [];
+  clean.forEach(key => {
+    if (!merged.includes(key)) merged.push(key);
+  });
   DEFAULT_NAV_ORDER.forEach(key => {
     if (!merged.includes(key)) merged.push(key);
   });
@@ -2041,46 +2048,75 @@ function normalizeNavOrder(order) {
 
 function getSavedNavOrder() {
   try {
-    return normalizeNavOrder(JSON.parse(localStorage.getItem(NAV_ORDER_KEY) || '[]'));
-  } catch {
+    const raw = localStorage.getItem(NAV_ORDER_KEY);
+    return normalizeNavOrder(raw ? JSON.parse(raw) : DEFAULT_NAV_ORDER);
+  } catch (error) {
+    console.warn('저장된 메뉴 순서 읽기 오류:', error);
     return [...DEFAULT_NAV_ORDER];
   }
 }
 
 function saveNavOrder(order) {
   const normalized = normalizeNavOrder(order);
-  localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(normalized));
-  return normalized;
+  currentNavOrder = [...normalized];
+  try {
+    localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(normalized));
+  } catch (error) {
+    console.warn('메뉴 순서 저장 오류:', error);
+  }
+  return [...normalized];
 }
 
-function getCurrentNavOrder() {
+function readNavOrderFromDom() {
   const nav = document.getElementById('nav-menu');
   if (!nav) return getSavedNavOrder();
   const keys = [...nav.children].map(el => el.dataset?.menuKey).filter(Boolean);
   return normalizeNavOrder(keys.length ? keys : getSavedNavOrder());
 }
 
-function applyNavOrder(order = getSavedNavOrder()) {
+function getCurrentNavOrder() {
+  if (Array.isArray(currentNavOrder) && currentNavOrder.length) {
+    return normalizeNavOrder(currentNavOrder);
+  }
+  currentNavOrder = getSavedNavOrder();
+  return [...currentNavOrder];
+}
+
+function applyNavOrder(order = getCurrentNavOrder(), shouldSave = true) {
   const nav = document.getElementById('nav-menu');
-  if (!nav) return getSavedNavOrder();
   const normalized = normalizeNavOrder(order);
+  currentNavOrder = [...normalized];
+
+  if (!nav) {
+    if (shouldSave) saveNavOrder(normalized);
+    return [...normalized];
+  }
+
   const items = {};
   [...nav.children].forEach(el => {
     const key = el.dataset?.menuKey;
     if (key) items[key] = el;
   });
-  normalized.forEach(key => {
-    if (items[key]) nav.appendChild(items[key]);
+
+  normalized.forEach((key, idx) => {
+    const el = items[key];
+    if (!el) return;
+    // 중요: CSS의 order 값 때문에 DOM 순서와 실제 보이는 순서가 달라지지 않도록 inline order도 함께 지정합니다.
+    el.style.order = String(idx + 1);
+    nav.appendChild(el);
   });
-  return saveNavOrder(normalized);
+
+  nav.dataset.appliedOrder = normalized.join(',');
+  if (shouldSave) saveNavOrder(normalized);
+  return [...normalized];
 }
 
 function persistAndApplyNavOrder(order, message) {
   const normalized = saveNavOrder(order);
-  applyNavOrder(normalized);
+  applyNavOrder(normalized, false);
   renderNavOrderSettings();
   if (message) showToast(message);
-  return normalized;
+  return [...normalized];
 }
 
 function renderNavOrderSettings() {
@@ -2090,7 +2126,7 @@ function renderNavOrderSettings() {
   box.innerHTML = order.map((key, idx) => {
     const item = NAV_LABELS[key] || { icon:'▫️', label:key };
     return `
-      <div class="menu-order-row" draggable="true" ondragstart="menuOrderDragStart(event, '${key}')" ondragover="menuOrderDragOver(event)" ondrop="menuOrderDrop(event, '${key}')" style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px; border:1px solid #eee0d1; border-radius:14px; background:#fffaf5;">
+      <div class="menu-order-row" draggable="true" data-menu-key="${key}" ondragstart="menuOrderDragStart(event, '${key}')" ondragover="menuOrderDragOver(event)" ondrop="menuOrderDrop(event, '${key}')" style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px; border:1px solid #eee0d1; border-radius:14px; background:#fffaf5;">
         <div style="display:flex; align-items:center; gap:10px; min-width:0;">
           <span style="font-size:16px; color:#9c8b7c; cursor:grab;">☰</span>
           <span style="display:inline-flex; width:30px; height:30px; border-radius:10px; align-items:center; justify-content:center; background:white; border:1px solid #eadbcb; font-size:15px;">${item.icon}</span>
@@ -2098,9 +2134,9 @@ function renderNavOrderSettings() {
         </div>
         <div style="font-size:12px; color:var(--text-dim);">상단 메뉴 ${idx + 1}번째</div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-          <button onclick="moveNavMenuItem('${key}', 'up')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === 0 ? 'disabled' : ''}>⬆️ 위</button>
-          <button onclick="moveNavMenuItem('${key}', 'down')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === order.length - 1 ? 'disabled' : ''}>⬇️ 아래</button>
-          <button onclick="moveNavMenuItem('${key}', 'top')" style="padding:7px 9px; border:none; border-radius:8px; background:#e8d9c7; cursor:pointer; font-family:inherit; font-size:12px;">맨앞</button>
+          <button type="button" onclick="moveNavMenuItem('${key}', 'up')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === 0 ? 'disabled' : ''}>⬆️ 위</button>
+          <button type="button" onclick="moveNavMenuItem('${key}', 'down')" style="padding:7px 9px; border:none; border-radius:8px; background:#f0f0f0; cursor:pointer; font-family:inherit; font-size:12px;" ${idx === order.length - 1 ? 'disabled' : ''}>⬇️ 아래</button>
+          <button type="button" onclick="moveNavMenuItem('${key}', 'top')" style="padding:7px 9px; border:none; border-radius:8px; background:#e8d9c7; cursor:pointer; font-family:inherit; font-size:12px;">맨앞</button>
         </div>
       </div>`;
   }).join('');
@@ -2110,6 +2146,7 @@ function moveNavMenuItem(key, direction) {
   const order = getCurrentNavOrder();
   const idx = order.indexOf(key);
   if (idx < 0) return;
+
   if (direction === 'up' && idx > 0) {
     [order[idx - 1], order[idx]] = [order[idx], order[idx - 1]];
   } else if (direction === 'down' && idx < order.length - 1) {
@@ -2117,8 +2154,11 @@ function moveNavMenuItem(key, direction) {
   } else if (direction === 'top') {
     order.splice(idx, 1);
     order.unshift(key);
+  } else {
+    return;
   }
-  persistAndApplyNavOrder(order, '✅ 메뉴 순서가 저장되었습니다');
+
+  persistAndApplyNavOrder(order, '✅ 메뉴 순서가 상단 메뉴에 바로 반영되었습니다');
 }
 
 let draggingNavKey = null;
@@ -2133,13 +2173,22 @@ function menuOrderDrop(event, targetKey) {
   event.preventDefault();
   const fromKey = event.dataTransfer?.getData('text/plain') || draggingNavKey;
   if (!fromKey || fromKey === targetKey) return;
+
   const order = getCurrentNavOrder();
   const fromIdx = order.indexOf(fromKey);
   const toIdx = order.indexOf(targetKey);
   if (fromIdx < 0 || toIdx < 0) return;
+
   order.splice(fromIdx, 1);
   order.splice(toIdx, 0, fromKey);
-  persistAndApplyNavOrder(order, '✅ 드래그한 메뉴 순서가 저장되었습니다');
+  persistAndApplyNavOrder(order, '✅ 드래그한 메뉴 순서가 상단 메뉴에 바로 반영되었습니다');
+}
+
+function saveCurrentNavOrder() {
+  const normalized = applyNavOrder(getCurrentNavOrder(), true);
+  renderNavOrderSettings();
+  showToast('💾 현재 메뉴 순서가 저장되었습니다');
+  return normalized;
 }
 
 function resetNavOrder() {
@@ -2147,11 +2196,10 @@ function resetNavOrder() {
   persistAndApplyNavOrder(DEFAULT_NAV_ORDER, '↩️ 메뉴 순서가 기본값으로 복원되었습니다');
 }
 
-
 function initNavOrderSystem() {
   try {
-    const savedOrder = getSavedNavOrder();
-    applyNavOrder(savedOrder);
+    currentNavOrder = getSavedNavOrder();
+    applyNavOrder(currentNavOrder, false);
     renderNavOrderSettings();
   } catch (error) {
     console.warn('메뉴 순서 초기화 오류:', error);
@@ -3478,7 +3526,7 @@ function collectAllLocalData() {
       결제카드: cards,
       거래내역: safeJsonParse(localStorage.getItem('blog_transactions'), []),
       방문자: parseInt(localStorage.getItem('visitor_count') || '0', 10),
-      메뉴순서: getSavedNavOrder()
+      메뉴순서: getCurrentNavOrder()
     },
     raw
   };
@@ -3942,6 +3990,6 @@ document.addEventListener('keydown', (e) => {
 </script>
 
 
-<!-- 최종 생성일자: 2026-05-13 22:33:11 KST / web-test 전용 / Firebase 경로: users/{UID}/sites/web-test -->
+<!-- 최종 생성일자: 2026-05-13 22:59:16 KST / web-test 전용 / Firebase 경로: users/{UID}/sites/web-test -->
 </body>
 </html>
