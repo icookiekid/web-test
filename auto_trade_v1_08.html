@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<title>cond1 급등초입포착 — 조건검색식 | 20260421</title>
+<style>:root{--AC:#00e676;max-width:860px;}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+:root{
+  --bg:#05080d;--bg2:#0b0f18;--bg3:#111722;--bg4:#161e2c;
+  --border:#1a2535;--border2:#223040;
+  --green:#00e676;--blue:#40c4ff;--yellow:#ffd740;
+  --red:#ff5252;--orange:#ff9100;--purple:#ea80fc;--teal:#64ffda;
+  --text:#c8d6e8;--text2:#7a90a8;--text3:#364858;--sw:256px;
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,230,118,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.018) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:200}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:var(--border2)}
+.sb-hd{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--AC);border:1px solid color-mix(in srgb,var(--AC) 40%,transparent);padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px;background:color-mix(in srgb,var(--AC) 8%,transparent)}
+.sb-title{font-size:13px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:3px}
+.sb-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)}
+.sb-part{padding:11px 16px 3px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3)}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 16px;font-size:12px;color:var(--text2);text-decoration:none;border-left:3px solid transparent;transition:all .15s}
+.sb-a:hover,.sb-a.on{color:var(--AC);background:color-mix(in srgb,var(--AC) 6%,transparent);border-left-color:var(--AC)}
+.sb-a.on{font-weight:700}
+.sb-n{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border2);min-width:17px;height:17px;padding:0 3px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-a.on .sb-n,.sb-a:hover .sb-n{background:color-mix(in srgb,var(--AC) 15%,transparent);border-color:var(--AC);color:var(--AC)}
+.main{margin-left:var(--sw);position:relative;z-index:1}
+.hero{padding:54px 56px 42px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,color-mix(in srgb,var(--AC) 5%,transparent),transparent);position:relative;overflow:hidden}
+.htags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.htag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:2px;border:1px solid;color:var(--AC);border-color:color-mix(in srgb,var(--AC) 40%,transparent);background:color-mix(in srgb,var(--AC) 6%,transparent)}
+.hero h1{font-size:clamp(22px,3.5vw,44px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:10px}
+.hero h1 em{color:var(--AC);font-style:normal}
+.hero-d{font-size:13px;color:var(--text2);max-width:600px;line-height:1.85;margin-bottom:22px}
+.hstats{display:flex;gap:24px;flex-wrap:wrap}
+.hs{font-family:'IBM Plex Mono',monospace}
+.hs-v{font-size:20px;font-weight:700;color:var(--AC);display:block}
+.hs-l{font-size:10px;color:var(--text3);letter-spacing:1px}
+.part-hd{padding:22px 56px 16px;background:var(--bg2);border-bottom:1px solid var(--border);border-top:2px solid var(--AC);position:sticky;top:0;z-index:50}
+.pn{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--AC);letter-spacing:3px;margin-bottom:4px}
+.pt{font-size:17px;font-weight:800;color:#fff}
+.sec{padding:44px 56px;border-bottom:1px solid var(--border);scroll-margin-top:0}
+.sey{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--AC);letter-spacing:2px;margin-bottom:7px}
+.sh{font-size:21px;font-weight:800;color:#fff;margin-bottom:5px}
+.sd{font-size:13px;color:var(--text2);margin-bottom:20px;max-width:680px;line-height:1.85}
+.box{display:flex;gap:12px;padding:14px 17px;border-radius:7px;margin:11px 0;border:1px solid}
+.bico{font-size:18px;flex-shrink:0;margin-top:2px}
+.bt{font-weight:700;font-size:13px;margin-bottom:3px}.bb{font-size:12.5px;line-height:1.75}
+.bg{background:rgba(0,230,118,.06);border-color:rgba(0,230,118,.3)}.bg .bt{color:var(--green)}
+.bb2{background:rgba(64,196,255,.06);border-color:rgba(64,196,255,.3)}.bb2 .bt{color:var(--blue)}
+.bw{background:rgba(255,145,0,.07);border-color:rgba(255,145,0,.35)}.bw .bt{color:var(--orange)}
+.bd{background:rgba(255,82,82,.07);border-color:rgba(255,82,82,.35)}.bd .bt{color:var(--red)}
+.by{background:rgba(255,215,64,.06);border-color:rgba(255,215,64,.3)}.by .bt{color:var(--yellow)}
+.bp{background:rgba(234,128,252,.07);border-color:rgba(234,128,252,.35)}.bp .bt{color:var(--purple)}
+.ba{background:color-mix(in srgb,var(--AC) 7%,transparent);border-color:color-mix(in srgb,var(--AC) 35%,transparent)}.ba .bt{color:var(--AC)}
+.code{background:#010509;border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin:11px 0}
+.cbar{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.clang{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:1px}
+.cbtn{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);background:transparent;border:1px solid var(--border2);padding:2px 9px;border-radius:3px;cursor:pointer;transition:all .15s}
+.cbtn:hover,.cbtn.ok{color:var(--AC);border-color:var(--AC)}
+pre{padding:15px 17px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.9}
+pre::-webkit-scrollbar{height:3px}pre::-webkit-scrollbar-thumb{background:var(--border2)}
+.ck{color:var(--purple)}.cs{color:var(--orange)}.cc{color:var(--text3);font-style:italic}
+.cn{color:var(--blue)}.cv{color:var(--green)}.cr{color:var(--red)}.cy{color:var(--yellow)}
+.term{background:#010509;border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin:11px 0}
+.tbar{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.td{width:10px;height:10px;border-radius:50%}
+.tdr{background:#ff5f56}.tdy{background:#ffbd2e}.tdg{background:#27c93f}
+.tlab{margin-left:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)}
+.tb2{padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.9}
+.tp{color:var(--green)}.tc{color:#dde8f5}.to{color:var(--text2)}.tok{color:var(--green)}.tw{color:var(--yellow)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:11px 0}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:11px 0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:11px 0}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;transition:border-color .2s}
+.card:hover{border-color:color-mix(in srgb,var(--AC) 35%,transparent)}
+.ctitle{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px}
+.cbody{font-size:12.5px;color:var(--text2);line-height:1.75}
+.cstat{text-align:center;padding:16px 10px}
+.sv{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:var(--AC)}
+.sl{font-size:11px;color:var(--text2);margin-top:3px}
+.tbl{overflow-x:auto;margin:11px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:var(--bg3);padding:8px 13px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);border-bottom:1px solid var(--border2);letter-spacing:1px}
+td{padding:9px 13px;border-bottom:1px solid rgba(26,37,53,.6);vertical-align:top;line-height:1.65}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.013)}
+.tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:3px;font-weight:700;margin:1px}
+.tg{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.tr2{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.3)}
+.ty{background:rgba(255,215,64,.1);color:var(--yellow);border:1px solid rgba(255,215,64,.3)}
+.tb3{background:rgba(64,196,255,.1);color:var(--blue);border:1px solid rgba(64,196,255,.3)}
+.tp2{background:rgba(234,128,252,.1);color:var(--purple);border:1px solid rgba(234,128,252,.3)}
+.tl{position:relative;padding-left:22px;margin:11px 0}
+.tl::before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:2px;background:linear-gradient(to bottom,var(--AC),var(--border))}
+.tli{position:relative;margin-bottom:18px}.tli:last-child{margin-bottom:0}
+.tldo{position:absolute;left:-20px;top:3px;width:11px;height:11px;border-radius:50%;background:var(--bg3);border:2px solid var(--AC)}
+.tlt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--AC);font-weight:600;margin-bottom:2px}
+.tln{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:2px}
+.tld{font-size:12.5px;color:var(--text2);line-height:1.65}
+.cl{list-style:none}
+.cl li{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(26,37,53,.5);font-size:12.5px;cursor:pointer}
+.cl li:last-child{border-bottom:none}
+.clb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;color:transparent}
+.cl li:hover .clb{border-color:var(--AC)}.clb.done{background:var(--AC);border-color:var(--AC);color:#000}
+.cl li.done-li>span{color:var(--text3);text-decoration:line-through}
+.steps{margin:12px 0}
+.step{display:flex;gap:15px;padding:14px 0;border-bottom:1px solid rgba(26,37,53,.5)}
+.step:last-child{border-bottom:none}
+.snum{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--AC),color-mix(in srgb,var(--AC) 60%,#fff));display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#000;flex-shrink:0;margin-top:2px}
+.stitle{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.sdesc{font-size:12.5px;color:var(--text2);line-height:1.75;margin-bottom:7px}
+.formula{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:18px;margin:12px 0;text-align:center}
+.feq{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--AC);margin:10px 0;font-weight:700}
+.feg{font-size:12px;color:var(--text2);margin-top:8px}
+.fund-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:22px;margin:13px 0}
+.fund-bar-wrap{margin:9px 0}
+.fund-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.fund-bar{height:7px;background:var(--border2);border-radius:4px;overflow:hidden}
+.fund-fill{height:100%;border-radius:4px}
+@media(max-width:900px){:root{--sw:210px}.sec,.hero{padding:32px 24px}.part-hd{padding:18px 24px}.g2,.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:640px){.sb{display:none}.main{margin-left:0}.hero,.sec{padding:24px 14px}}
+
+body{max-width:860px;margin:0 auto}
+.sb{display:none}.main{margin-left:0}
+.hero{padding:44px 32px 36px}.sec{padding:36px 32px}.part-hd{padding:18px 32px;position:static}
+@media(max-width:640px){.hero,.sec{padding:24px 14px}}
+</style>
+<style>
+html,body{margin:0!important;padding:0!important;width:100%!important;overflow-x:hidden!important;}
+body{display:block!important;}
+main,.main,.content,.main-content,[class*="main-content"],[class*="content-area"]{margin-left:0!important;margin:0 auto!important;width:min(980px,100%)!important;max-width:980px!important;padding:18px!important;}
+.webtest-backbar{position:sticky;top:0;z-index:9999;background:rgba(13,17,23,.94);backdrop-filter:blur(10px);border-bottom:1px solid #30363d;padding:10px 14px;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;}
+.webtest-backbar-inner{max-width:980px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+.webtest-backbar a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#e6edf3;font-weight:800;border:1px solid #30363d;background:#161b22;border-radius:999px;padding:9px 14px;}
+.webtest-backbar .small{font-size:12px;color:#8b949e;}
+pre,code{max-width:100%;overflow-x:auto!important;white-space:pre-wrap!important;word-break:break-word!important;}
+@media(max-width:640px){main,.main,.content,.main-content,[class*="main-content"],[class*="content-area"]{padding:14px!important}.webtest-backbar a{width:100%;justify-content:center}.webtest-backbar .small{width:100%;text-align:center}}
+</style></head>
+<body><div class="webtest-backbar"><div class="webtest-backbar-inner"><a href="auto_trade_v1_index.html">← v1 자료 목록</a><a href="../index.html">문서 보관함</a><span class="small">🔍 조건1 · 급등초입포착 · docs 분리형</span></div></div>
+<div class="main">
+<div class="hero" style="border-left:4px solid var(--AC)">
+<div class="htags">
+<span class="htag">COND1</span>
+<span class="htag">단타</span>
+<span style="font-family:IBM Plex Mono;font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:2px;border:1px solid;color:#ffd740;border-color:#ffd74080;background:#ffd74010">중간</span>
+<span class="htag">20260421</span>
+</div>
+<h1><em>급등초입포착</em></h1>
+<p class="hero-d">세력이 막 들어오는 순간 포착 — 거래량 폭발 초입</p>
+<div class="hstats">
+<div class="hs"><span class="hs-v">단타</span><span class="hs-l">전략 유형</span></div>
+<div class="hs"><span class="hs-v" style="color:#ffd740">중간</span><span class="hs-l">위험도</span></div>
+<div class="hs"><span class="hs-v">8개</span><span class="hs-l">조건 항목</span></div>
+<div class="hs"><span class="hs-v" style="font-size:14px;color:var(--green)">✅ 처음부터 활성화 가능</span><span class="hs-l">처음 활성화</span></div>
+</div>
+</div>
+<div class="part-hd"><div class="pn">언제 신호가 발생하나요?</div><div class="pt">급등초입포착 신호 타이밍</div></div>
+<section class="sec" id="when">
+<div class="sd">거래량이 갑자기 3배 터지면서 가격도 올라오는 순간. 세력 유입 초기에 탑승. 타이밍이 핵심이므로 5분마다 갱신 필수.</div>
+<div class="box bw"><div class="bico">⚠️</div><div>
+<div class="bt">영웅문 저장명 정확히 일치!</div>
+<div class="bb">영웅문에 저장할 조건식 이름: <strong style="color:var(--AC);font-size:15px">급등초입포착</strong><br/>
+    프로그램 CONDITION_NAMES["scalp_momentum"] 값과 정확히 일치해야 합니다</div>
+</div></div>
+</section>
+<div class="part-hd"><div class="pn">영웅문 조건 설정값</div><div class="pt">급등초입포착 전체 조건 8개</div></div>
+<section class="sec" id="items">
+<div class="tbl"><table>
+<tr><th>#</th><th>항목 유형</th><th>조건값</th></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">01</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">거래량</td><td>전일 거래량 대비 300% 이상</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">02</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">거래량</td><td>20일 평균 거래량 대비 200% 이상</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">03</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">이동평균</td><td>현재가 &gt; 5일 이동평균</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">04</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">등락률</td><td>+2% 이상 ~ +8% 이하</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">05</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">체결강도</td><td>130 이상</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">06</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">시가총액</td><td>500억원 이상</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">07</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">현재가</td><td>3,000원 이상 ~ 50,000원 이하</td></tr>
+<tr><td><strong style="font-family:IBM Plex Mono;font-size:11px">08</strong></td><td style="color:var(--text2);font-family:IBM Plex Mono;font-size:11px">시장</td><td>코스피 + 코스닥 전체</td></tr>
+</table></div>
+<div class="box ba"><div class="bico">💡</div><div>
+<div class="bt">핵심 포인트</div>
+<div class="bb">등락률 +8% 상한선이 핵심 — 이미 많이 오른 종목 제외. 거래량 300% 기준 낮추면 신호 증가(정확도↓).</div>
+</div></div>
+</section>
+<div class="part-hd"><div class="pn">영웅문 저장 방법</div><div class="pt">5단계로 저장</div></div>
+<section class="sec" id="howto">
+<div class="steps">
+<div class="step"><div class="snum">1</div><div>
+<div class="stitle">영웅문 HTS → 조건검색 창 열기</div>
+<div class="sdesc">상단 메뉴 [조건검색] 클릭 또는 단축키 Alt+Z</div>
+</div></div>
+<div class="step"><div class="snum">2</div><div>
+<div class="stitle">[신규] → 조건명 입력</div>
+<div class="sdesc">조건명 입력란에 정확히: <strong style="color:var(--AC);font-size:15px">급등초입포착</strong></div>
+</div></div>
+<div class="step"><div class="snum">3</div><div>
+<div class="stitle">조건 항목 8개 추가</div>
+<div class="sdesc">왼쪽 지표 목록 → 항목 더블클릭 → 조건값 입력 → [추가] 반복</div>
+</div></div>
+<div class="step"><div class="snum">4</div><div>
+<div class="stitle">[저장] → [검색] 테스트</div>
+<div class="sdesc">결과에 종목이 나오면 정상. 없으면 조건값 일부 완화</div>
+</div></div>
+</div>
+<div class="code"><div class="cbar"><span class="clang">CONFIG에 추가하는 방법</span><button class="cbtn" onclick="cp(this,'cfg1')">복사</button></div>
+<pre id="cfg1"><span class="cs">"active_conditions"</span>: [
+    <span class="cs">"scalp_momentum"</span>,   <span class="cc"># 급등초입포착 ← 이 줄 추가</span>
+    <span class="cc"># ... 다른 조건식들 ...</span>
+],
+<span class="cc"># 권장 파라미터:</span>
+<span class="cs">"scalp_tp"</span>: <span class="cn">0.025</span>,   <span class="cc"># 익절</span>
+<span class="cs">"scalp_sl"</span>: <span class="cn">0.015</span>,  <span class="cc"># 손절</span></pre></div>
+</section>
+<div class="part-hd"><div class="pn">시장 상황별 활용</div><div class="pt">급등초입포착 시장별 권장</div></div>
+<section class="sec" id="market">
+<div class="tbl"><table>
+<tr><th>시장 상황</th><th>활용 여부</th><th>이유</th></tr>
+<tr><td>강세장</td><td style="color:var(--green);font-weight:700">✅ 적극 활용</td><td style="color:var(--text2);font-size:12px">거래량 폭발 빈도 높아 신호 많음</td></tr>
+<tr><td>보합장</td><td style="color:var(--yellow);font-weight:700">⚠️ 선별 활용</td><td style="color:var(--text2);font-size:12px">scalp_sl=1%로 타이트하게</td></tr>
+<tr><td>약세장</td><td style="color:var(--red);font-weight:700">❌ 비활성화</td><td style="color:var(--text2);font-size:12px">하락장 거래량 급증 = 하락 신호일 수 있음</td></tr>
+</table></div>
+<div class="box bd" style="margin-top:12px"><div class="bico">🚨</div><div>
+<div class="bt">반드시 모의투자 2주 이상 후 실전 투입</div>
+<div class="bb">조건검색식 통과 후에도 프로그램 내부에서 RSI·VWAP·MACD 등 기술지표를 한 번 더 확인합니다.<br/>
+    AI 버전은 추가로 Claude/GPT AI 검증과 뉴스 분석도 수행합니다.</div>
+</div></div>
+<div style="text-align:center;padding:24px 0 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)">
+    cond1 급등초입포착 조건검색식 설명서 | 생성일: 20260421
+  </div>
+</section>
+</div>
+<script>
+function ck(li){li.querySelector('.clb').classList.toggle('done');li.classList.toggle('done-li')}
+function cp(btn,id){navigator.clipboard.writeText(document.getElementById(id)?.innerText||'').then(()=>{btn.textContent='✓복사';btn.classList.add('ok');setTimeout(()=>{btn.textContent='복사';btn.classList.remove('ok')},2000)})}
+const secs=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.sb-a');
+window.addEventListener('scroll',()=>{let c='';secs.forEach(s=>{if(window.scrollY>=s.offsetTop-100)c=s.id});links.forEach(a=>{a.classList.toggle('on',a.getAttribute('href')==='#'+c)})},{passive:true});
+
+function cp(btn,id){navigator.clipboard.writeText(document.getElementById(id)?.innerText||'').then(()=>{btn.textContent='✓복사';btn.classList.add('ok');setTimeout(()=>{btn.textContent='복사';btn.classList.remove('ok')},2000)})}
+</script>
+</body>
+</html>
