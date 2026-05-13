@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>키움 자동매매 + 백테스트 통합본 — 사용설명서</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg:       #0d1117;
+  --bg2:      #161b22;
+  --bg3:      #21262d;
+  --border:   #30363d;
+  --green:    #3fb950;
+  --blue:     #58a6ff;
+  --red:      #f85149;
+  --yellow:   #e3b341;
+  --orange:   #ffa657;
+  --purple:   #bc8cff;
+  --text:     #e6edf3;
+  --text2:    #8b949e;
+  --sidebar-w: 260px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  display: flex;
+}
+
+/* ── 사이드바 ─────────────────────────── */
+nav {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0;
+  overflow-y: auto;
+  padding: 0 0 40px;
+  z-index: 100;
+}
+
+.nav-header {
+  padding: 22px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.nav-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+}
+.nav-version {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+.nav-group {
+  padding: 14px 12px 4px;
+}
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  text-transform: uppercase;
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+.nav-group a {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--text2);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.nav-group a:hover, .nav-group a.active {
+  background: rgba(88,166,255,.1);
+  color: var(--blue);
+}
+.nav-group a span {
+  margin-right: 8px;
+}
+
+/* ── 메인 콘텐츠 ──────────────────────── */
+main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 48px 52px 80px;
+  max-width: 980px;
+}
+
+/* ── 섹션 ─────────────────────────────── */
+.section {
+  margin-bottom: 64px;
+  scroll-margin-top: 30px;
+}
+
+.section-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(63,185,80,.1);
+  border: 1px solid rgba(63,185,80,.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+h1.page-title {
+  font-size: 34px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.page-subtitle {
+  font-size: 15px;
+  color: var(--text2);
+  margin-bottom: 40px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue);
+  margin: 24px 0 10px;
+}
+p { font-size: 14px; color: var(--text2); margin-bottom: 12px; }
+strong { color: var(--text); }
+
+/* ── 카드 그리드 ──────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--blue); }
+.card-icon { font-size: 22px; margin-bottom: 10px; }
+.card-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── 스텝 ─────────────────────────────── */
+.steps { margin: 20px 0; }
+.step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.step::before {
+  content: '';
+  position: absolute;
+  left: 19px; top: 40px;
+  width: 2px;
+  height: calc(100% - 10px);
+  background: var(--border);
+}
+.step:last-child::before { display: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(88,166,255,.15);
+  border: 2px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  z-index: 1;
+}
+.step-body { padding-top: 6px; flex: 1; }
+.step-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: var(--text2); }
+
+/* ── 코드 블록 ────────────────────────── */
+.code-block {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 14px 0;
+  overflow-x: auto;
+  position: relative;
+}
+.code-block-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.code-block code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: #e6edf3;
+  line-height: 1.8;
+  white-space: pre;
+  display: block;
+}
+.code-block code .cm { color: var(--text2); }
+.code-block code .kw { color: var(--purple); }
+.code-block code .st { color: var(--green); }
+.code-block code .nm { color: var(--blue); }
+.code-block code .nu { color: var(--orange); }
+.code-block code .hl { background: rgba(88,166,255,.1); border-radius: 3px; padding: 0 4px; }
+
+/* ── 테이블 ───────────────────────────── */
+.param-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.param-table th {
+  background: var(--bg3);
+  padding: 9px 14px;
+  text-align: left;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--border);
+}
+.param-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(48,54,61,.6);
+  vertical-align: top;
+}
+.param-table tr:hover td { background: rgba(255,255,255,.02); }
+.param-table td:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--blue);
+  white-space: nowrap;
+}
+.param-table td:nth-child(2) {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--orange);
+}
+.param-table td:last-child { color: var(--text2); }
+
+/* ── 뱃지 ─────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green  { background: rgba(63,185,80,.15);  color: var(--green); }
+.badge-blue   { background: rgba(88,166,255,.15); color: var(--blue); }
+.badge-red    { background: rgba(248,81,73,.15);  color: var(--red); }
+.badge-yellow { background: rgba(227,179,65,.15); color: var(--yellow); }
+.badge-orange { background: rgba(255,166,87,.15); color: var(--orange); }
+
+/* ── 경고/팁 박스 ─────────────────────── */
+.alert {
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+  border-left: 3px solid;
+  display: flex;
+  gap: 12px;
+}
+.alert-icon { font-size: 16px; flex-shrink: 0; }
+.alert-body { flex: 1; }
+.alert-title { font-weight: 700; margin-bottom: 4px; }
+.alert-warn  { background: rgba(227,179,65,.07); border-color: var(--yellow); color: var(--yellow); }
+.alert-warn .alert-body { color: #c9b44a; }
+.alert-info  { background: rgba(88,166,255,.07); border-color: var(--blue);   color: var(--blue); }
+.alert-info .alert-body  { color: #8ab4f0; }
+.alert-error { background: rgba(248,81,73,.07);  border-color: var(--red);    color: var(--red); }
+.alert-error .alert-body { color: #d47370; }
+.alert-green { background: rgba(63,185,80,.07);  border-color: var(--green);  color: var(--green); }
+.alert-green .alert-body { color: #6ecb7a; }
+
+/* ── 두 컬럼 ──────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+.col-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+}
+.col-box h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.col-box ul { list-style: none; }
+.col-box li {
+  font-size: 12.5px;
+  color: var(--text2);
+  padding: 4px 0;
+  padding-left: 14px;
+  position: relative;
+}
+.col-box li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-size: 10px;
+}
+
+/* ── 등급표 ───────────────────────────── */
+.grade-table {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.grade-cell {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.grade-letter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.grade-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+/* ── 흐름도 ───────────────────────────── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.flow-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  min-width: 110px;
+}
+.flow-arrow {
+  font-size: 16px;
+  color: var(--text2);
+  padding: 0 8px;
+}
+.flow-box.green  { border-color: var(--green);  color: var(--green);  background: rgba(63,185,80,.08); }
+.flow-box.blue   { border-color: var(--blue);   color: var(--blue);   background: rgba(88,166,255,.08); }
+.flow-box.yellow { border-color: var(--yellow); color: var(--yellow); background: rgba(227,179,65,.08); }
+.flow-box.red    { border-color: var(--red);    color: var(--red);    background: rgba(248,81,73,.08); }
+
+/* ── 파일 트리 ────────────────────────── */
+.file-tree {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 14px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 2;
+}
+.file-tree .dir  { color: var(--blue); }
+.file-tree .file { color: var(--text2); }
+.file-tree .main { color: var(--green); font-weight: 600; }
+.file-tree .new  { color: var(--orange); }
+
+/* ── 헤더 히어로 ──────────────────────── */
+.hero {
+  background: linear-gradient(135deg, rgba(88,166,255,.08) 0%, rgba(63,185,80,.08) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(88,166,255,.1) 0%, transparent 70%);
+}
+.hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.hero h1 { font-size: 30px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+.hero p  { font-size: 14px; color: var(--text2); max-width: 580px; }
+.hero-meta {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hero-meta-label { font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+.hero-meta-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); font-weight: 600; }
+
+/* ── TOC 하이라이트 ───────────────────── */
+.toc-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  display: inline-block;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.scroll-top {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 40px; height: 40px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text2);
+  transition: all 0.2s;
+  text-decoration: none;
+  z-index: 200;
+}
+.scroll-top:hover { border-color: var(--blue); color: var(--blue); }
+</style>
+<style>
+html,body{margin:0!important;padding:0!important;width:100%!important;overflow-x:hidden!important;}
+body{display:block!important;}
+main,.main,.content,.main-content,[class*="main-content"],[class*="content-area"]{margin-left:0!important;margin:0 auto!important;width:min(980px,100%)!important;max-width:980px!important;padding:18px!important;}
+.webtest-backbar{position:sticky;top:0;z-index:9999;background:rgba(13,17,23,.94);backdrop-filter:blur(10px);border-bottom:1px solid #30363d;padding:10px 14px;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;}
+.webtest-backbar-inner{max-width:980px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+.webtest-backbar a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#e6edf3;font-weight:800;border:1px solid #30363d;background:#161b22;border-radius:999px;padding:9px 14px;}
+.webtest-backbar .small{font-size:12px;color:#8b949e;}
+pre,code{max-width:100%;overflow-x:auto!important;white-space:pre-wrap!important;word-break:break-word!important;}
+@media(max-width:640px){main,.main,.content,.main-content,[class*="main-content"],[class*="content-area"]{padding:14px!important}.webtest-backbar a{width:100%;justify-content:center}.webtest-backbar .small{width:100%;text-align:center}}
+</style></head>
+<body><div class="webtest-backbar"><div class="webtest-backbar-inner"><a href="auto_trade_v1_index.html">← v1 자료 목록</a><a href="../index.html">문서 보관함</a><span class="small">📘 사용설명서 통합본 · docs 분리형</span></div></div>
+<!-- ══ 사이드바 ════════════════════════════════════════ -->
+
+<!-- ══ 메인 ════════════════════════════════════════════ -->
+<main>
+<!-- ── 히어로 ───────────────────────── -->
+<div class="hero">
+<div class="hero-tags">
+<span class="badge badge-green">Standard v2.0</span>
+<span class="badge badge-blue">백테스트 통합</span>
+<span class="badge badge-yellow">키움 OpenAPI+</span>
+<span class="badge badge-orange">2026-04-28</span>
+</div>
+<h1>키움 자동매매 + 백테스트<br/>통합 사용설명서</h1>
+<p>단타·스윙 조건검색 자동매매와 히스토리컬 백테스트 엔진이 하나의 파일로 통합된 시스템의 완전 가이드입니다.</p>
+<div class="hero-meta">
+<div class="hero-meta-item">
+<span class="hero-meta-label">통합 파일</span>
+<span class="hero-meta-value">v1_kiwoom_standard_with_backtest_20260428.py</span>
+</div>
+<div class="hero-meta-item">
+<span class="hero-meta-label">라인 수</span>
+<span class="hero-meta-value">2,971 lines</span>
+</div>
+<div class="hero-meta-item">
+<span class="hero-meta-label">Python</span>
+<span class="hero-meta-value">3.9.x 32bit</span>
+</div>
+</div>
+</div>
+<!-- ══ 1. 시스템 개요 ══ -->
+<section class="section" id="overview">
+<div class="section-badge">OVERVIEW</div>
+<h2>🗺️ 시스템 개요</h2>
+<p>이 통합 시스템은 두 가지 핵심 기능을 하나의 파일로 제공합니다.</p>
+<div class="card-grid">
+<div class="card">
+<div class="card-icon">🤖</div>
+<div class="card-title">자동매매 엔진</div>
+<div class="card-desc">키움 OpenAPI+ 연동, 조건검색식 5종으로 매수 신호 포착, 단타/스윙 전략 자동 실행</div>
+</div>
+<div class="card">
+<div class="card-icon">📊</div>
+<div class="card-title">백테스트 엔진</div>
+<div class="card-desc">2020~2024 일봉 데이터로 전략 검증, 승률·MDD·샤프 지수 등 종합 성과 분석</div>
+</div>
+<div class="card">
+<div class="card-icon">🔍</div>
+<div class="card-title">조건검색 5종</div>
+<div class="card-desc">급등초입포착, 눌림목반등, MACD골든크로스, 급등모멘텀, 외국인연속매수</div>
+</div>
+<div class="card">
+<div class="card-icon">🛡️</div>
+<div class="card-title">리스크 관리</div>
+<div class="card-desc">일일 손실 한도, 연속 손절 방지, 트레일링 스탑, 쿨다운 대기 시스템</div>
+</div>
+<div class="card">
+<div class="card-icon">📄</div>
+<div class="card-title">HTML 리포트</div>
+<div class="card-desc">백테스트 결과를 자산 곡선, 월별 손익, Walk-Forward 검증 등 시각화</div>
+</div>
+<div class="card">
+<div class="card-icon">📦</div>
+<div class="card-title">EXE 패키징</div>
+<div class="card-desc">build_exe.bat 한 번으로 단일 실행파일(.exe) 생성, 배포 용이</div>
+</div>
+</div>
+<h3>전체 실행 흐름</h3>
+<div class="flow">
+<div class="flow-box blue">프로그램 시작</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">계좌 입력</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box green">키움 로그인</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">조건검색 로드</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box yellow">실시간 매매</div>
+</div>
+<div class="flow" style="margin-top:8px">
+<div class="flow-box blue">📊 백테스트 버튼</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">설정 입력</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box green">백그라운드 실행</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">HTML 리포트 생성</div>
+</div>
+</section>
+<!-- ══ 2. 설치 요구사항 ══ -->
+<section class="section" id="requirements">
+<div class="section-badge">SETUP</div>
+<h2>⚙️ 설치 요구사항</h2>
+<div class="two-col">
+<div class="col-box">
+<h4>🖥️ 시스템 환경</h4>
+<ul>
+<li>Windows 10/11 (64bit OS)</li>
+<li><strong>Python 3.9.x — 반드시 32bit 버전</strong></li>
+<li>키움증권 계좌 (모의투자 가능)</li>
+<li>키움 OpenAPI+ 설치 완료</li>
+<li>영웅문 HTS 조건검색식 5개 저장</li>
+</ul>
+</div>
+<div class="col-box">
+<h4>📦 Python 패키지</h4>
+<ul>
+<li>PyQt5 == 5.15.9</li>
+<li>pandas == 2.0.3</li>
+<li>numpy == 1.24.4</li>
+<li>matplotlib (백테스트 차트용)</li>
+<li>yfinance (데이터 1순위)</li>
+<li>finance-datareader (데이터 2순위)</li>
+<li>pykrx (데이터 3순위)</li>
+</ul>
+</div>
+</div>
+<div class="code-block">
+<div class="code-block-label">패키지 한 번에 설치</div>
+<code><span class="cm"># Python 3.9 32bit 환경에서 실행</span>
+pip install PyQt5==5.15.9 pandas==2.0.3 numpy==1.24.4 ^
+    matplotlib yfinance finance-datareader pykrx</code>
+</div>
+<div class="alert alert-warn">
+<div class="alert-icon">⚠️</div>
+<div class="alert-body">
+<div class="alert-title">32bit Python 필수</div>
+        키움 OpenAPI+는 32bit 전용 DLL입니다. 64bit Python에서는 <code>QAxWidget</code> 로드 시 오류가 발생합니다.
+        <a href="https://www.python.org/downloads/release/python-3913/" style="color:var(--blue)">python.org</a>에서
+        <strong>Windows x86 executable installer</strong>를 설치하세요.
+      </div>
+</div>
+<div class="alert alert-info">
+<div class="alert-icon">💡</div>
+<div class="alert-body">
+<div class="alert-title">백테스트만 사용할 경우</div>
+        OpenAPI 설치 없이도 백테스트 기능은 완전히 동작합니다.
+        64bit Python에서 명령줄로 <code>v1_backtest_20260427.py</code>를 직접 실행하거나, 통합 파일에서 PyQt5 없이 백테스트 클래스만 import 할 수 있습니다.
+      </div>
+</div>
+</section>
+<!-- ══ 3. 파일 구성 ══ -->
+<section class="section" id="files">
+<div class="section-badge">FILES</div>
+<h2>📁 파일 구성</h2>
+<div class="file-tree">
+<span class="dir">📁 프로젝트 폴더/</span>
+├── <span class="main">v1_kiwoom_standard_with_backtest_20260428.py</span> <span style="color:#3fb950">← ★ 통합 메인 파일</span>
+├── <span class="new">build_exe.bat</span> <span style="color:#ffa657">← EXE 빌드 스크립트</span>
+├── <span class="new">README_통합본.md</span> <span style="color:#ffa657">← 간단 요약</span>
+├── <span class="file">v1_kiwoom_claude_ai_20260421.py</span> <span style="color:#8b949e">← Claude AI 버전</span>
+├── <span class="file">v1_kiwoom_openai_gpt_20260421.py</span> <span style="color:#8b949e">← GPT 버전</span>
+├── <span class="file">v1_backtest_20260427.py</span> <span style="color:#8b949e">← 백테스트 단독 실행용</span>
+├── <span class="file">v1_guide_*.html</span> <span style="color:#8b949e">← 각 버전 가이드</span>
+├── <span class="file">v1_code_*.html</span> <span style="color:#8b949e">← 각 버전 코드 뷰어</span>
+├── <span class="file">v1_cond*_*.html</span> <span style="color:#8b949e">← 조건검색식 5종 설명</span>
+<span class="dir">📁 backtest_results/</span> <span style="color:#8b949e">← 자동 생성</span>
+│   ├── <span class="file">bt_report_날짜.html</span>
+│   ├── <span class="file">bt_chart_날짜.png</span>
+│   └── <span class="file">bt_trades_날짜.json</span>
+<span class="dir">📁 backtest_cache/</span> <span style="color:#8b949e">← 자동 생성 (재사용 데이터)</span>
+<span class="dir">📁 backtest_data/</span> <span style="color:#8b949e">← CSV 파일 위치 (선택)</span>
+<span class="dir">📁 log_standard_날짜.txt</span> <span style="color:#8b949e">← 매매 로그</span>
+</div>
+</section>
+<!-- ══ 4. 빠른 시작 ══ -->
+<section class="section" id="quickstart">
+<div class="section-badge">QUICKSTART</div>
+<h2>🚀 빠른 시작</h2>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<div class="step-title">영웅문 HTS에서 조건검색식 5개 저장</div>
+<div class="step-desc">영웅문 → 조건검색 탭 → 조건식 편집기에서 아래 이름으로 정확히 저장</div>
+<div class="code-block" style="margin-top:10px">
+<code>급등초입포착 / 눌림목반등 / MACD골든크로스 / 급등모멘텀 / 외국인연속매수</code>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<div class="step-title">파이썬 파일 실행</div>
+<div class="step-desc">32bit Python 3.9 환경에서 실행합니다.</div>
+<div class="code-block" style="margin-top:10px">
+<code>python v1_kiwoom_standard_with_backtest_20260428.py</code>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<div class="step-title">계좌번호 입력 팝업</div>
+<div class="step-desc">프로그램 시작 시 계좌번호 입력 다이얼로그가 나타납니다. 키움 계좌번호(숫자만, 하이픈 제외)를 입력하세요.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<div class="step-title">자동 로그인 &amp; 매매 시작</div>
+<div class="step-desc">로그인 완료 후 조건검색식이 자동 로드됩니다. <strong>09:00 ~ 15:30</strong> 사이에 신호가 발생하면 자동 매수/매도가 실행됩니다.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">5</div>
+<div class="step-body">
+<div class="step-title">📊 백테스트 실행 (선택)</div>
+<div class="step-desc">메인 창의 <strong style="color:var(--green)">📊 백테스트 실행</strong> 버튼을 클릭하면 백테스트 설정 창이 열립니다. 자동매매와 동시에 사용 가능합니다.</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ══ 5. 로그인 & 계좌 설정 ══ -->
+<section class="section" id="login">
+<div class="section-badge">AUTO TRADING</div>
+<h2>🔑 로그인 &amp; 계좌 설정</h2>
+<p>프로그램 시작 직후 <strong>계좌번호 입력 팝업</strong>이 나타납니다.</p>
+<div class="two-col">
+<div class="col-box">
+<h4>💳 계좌번호 입력</h4>
+<ul>
+<li>숫자만 입력 (하이픈 없이)</li>
+<li>예: <code style="color:var(--orange)">1234567890</code></li>
+<li>모의투자 계좌도 동일하게 입력</li>
+<li>입력 취소 시 프로그램 종료</li>
+</ul>
+</div>
+<div class="col-box">
+<h4>⏱️ 로그인 흐름</h4>
+<ul>
+<li>계좌 입력 → 자동 로그인 시도</li>
+<li>키움 로그인 창이 뜨면 ID/PW 입력</li>
+<li>로그인 완료까지 약 6~10초 대기</li>
+<li>실패 시 10초 후 자동 재시도</li>
+</ul>
+</div>
+</div>
+<div class="alert alert-green">
+<div class="alert-icon">✅</div>
+<div class="alert-body">
+<div class="alert-title">휴장일에도 실행 가능</div>
+        휴장일에는 로그인 후 대기 상태로 유지됩니다. 백테스트 기능은 항상 사용 가능합니다.
+      </div>
+</div>
+</section>
+<!-- ══ 6. 조건검색식 5종 ══ -->
+<section class="section" id="conditions">
+<div class="section-badge">AUTO TRADING</div>
+<h2>🔍 조건검색식 5종</h2>
+<p>영웅문 HTS에 아래 이름으로 정확히 저장된 조건검색식을 불러옵니다. <strong>이름이 다르면 로드 실패합니다.</strong></p>
+<table class="param-table">
+<tr>
+<th>조건식 이름</th>
+<th>전략 유형</th>
+<th>활성화</th>
+<th>설명</th>
+</tr>
+<tr>
+<td>급등초입포착</td>
+<td><span class="badge badge-blue">단타</span></td>
+<td><span class="badge badge-green">기본 ON</span></td>
+<td>거래량 급증 + 상승 초입 구간 포착</td>
+</tr>
+<tr>
+<td>눌림목반등</td>
+<td><span class="badge badge-blue">단타</span></td>
+<td><span class="badge badge-green">기본 ON</span></td>
+<td>단기 눌림목 후 반등 시작 신호</td>
+</tr>
+<tr>
+<td>MACD골든크로스</td>
+<td><span class="badge badge-yellow">스윙</span></td>
+<td><span class="badge badge-green">기본 ON</span></td>
+<td>MACD 히스토그램 전환 + 이동평균 정배열</td>
+</tr>
+<tr>
+<td>급등모멘텀</td>
+<td><span class="badge badge-blue">단타</span></td>
+<td><span class="badge badge-red">기본 OFF</span></td>
+<td>고위험·고수익 급등 모멘텀 추종. 2주 모의 후 활성화 권장</td>
+</tr>
+<tr>
+<td>외국인연속매수</td>
+<td><span class="badge badge-yellow">스윙</span></td>
+<td><span class="badge badge-green">기본 ON</span></td>
+<td>외국인 연속 순매수 + 기관 동반 매수</td>
+</tr>
+</table>
+<h3>수동으로 조건검색 실행</h3>
+<p>메인 창의 <strong style="color:var(--yellow)">🔍 조건검색 즉시 실행</strong> 버튼을 누르면 등록된 조건검색을 즉시 재실행합니다.</p>
+</section>
+<!-- ══ 7. 매매 전략 ══ -->
+<section class="section" id="strategies">
+<div class="section-badge">AUTO TRADING</div>
+<h2>💡 매매 전략 상세</h2>
+<div class="two-col">
+<div class="col-box">
+<h4>🟢 단타 전략 (ScalpStrategy)</h4>
+<ul>
+<li>조건검색 결과 + RSI 과매도 확인</li>
+<li>거래량 2배 이상 급증 확인</li>
+<li>VWAP 지지 여부 체크</li>
+<li>종목당 자금의 <strong>15%</strong> 투입</li>
+<li>익절 <strong>+2.5%</strong> / 손절 <strong>-1.5%</strong></li>
+<li>손절 후 <strong>30분</strong> 동일 종목 재진입 금지</li>
+<li>RSI 65 이상 + 수익 시 추가 청산</li>
+</ul>
+</div>
+<div class="col-box">
+<h4>🔵 스윙 전략 (SwingStrategy)</h4>
+<ul>
+<li>MA20 &gt; MA60 정배열 확인</li>
+<li>MACD 히스토그램 골든크로스</li>
+<li>볼린저밴드 중심선 위 확인</li>
+<li>종목당 자금의 <strong>20%</strong> 투입</li>
+<li>익절 <strong>+10%</strong> / 손절 <strong>-5%</strong></li>
+<li>최대 보유 <strong>10영업일</strong></li>
+<li>MA20 이탈 시 자동 청산</li>
+</ul>
+</div>
+</div>
+<h3>청산 우선순위</h3>
+<div class="flow">
+<div class="flow-box green">익절 도달</div>
+<div class="flow-arrow"> &gt; </div>
+<div class="flow-box red">손절 도달</div>
+<div class="flow-arrow"> &gt; </div>
+<div class="flow-box yellow">트레일링 스탑 2%</div>
+<div class="flow-arrow"> &gt; </div>
+<div class="flow-box">보유기간 초과</div>
+<div class="flow-arrow"> &gt; </div>
+<div class="flow-box">MA20 이탈</div>
+</div>
+</section>
+<!-- ══ 8. 리스크 관리 ══ -->
+<section class="section" id="risk">
+<div class="section-badge">AUTO TRADING</div>
+<h2>🛡️ 리스크 관리</h2>
+<table class="param-table">
+<tr><th>항목</th><th>기본값</th><th>설명</th></tr>
+<tr>
+<td>max_stocks</td>
+<td>5</td>
+<td>동시 보유 최대 종목 수 (초과 시 신규 매수 차단)</td>
+</tr>
+<tr>
+<td>daily_loss_limit</td>
+<td>-3%</td>
+<td>일일 손실 한도. 초과 시 당일 매매 중단</td>
+</tr>
+<tr>
+<td>trailing_stop</td>
+<td>2%</td>
+<td>고점 대비 2% 하락 시 트레일링 스탑 청산</td>
+</tr>
+<tr>
+<td>scalp_cooldown_min</td>
+<td>30분</td>
+<td>단타 손절 후 동일 종목 재진입 대기시간</td>
+</tr>
+<tr>
+<td>연속 손절 감지</td>
+<td>3회</td>
+<td>3회 연속 손절 시 경고 알림 + 자동 일시 정지</td>
+</tr>
+</table>
+<div class="alert alert-warn">
+<div class="alert-icon">⚠️</div>
+<div class="alert-body">
+<div class="alert-title">반드시 모의투자로 먼저 검증하세요</div>
+        실전 계좌 투입 전 최소 2주 이상 모의투자를 통해 전략 동작을 확인하세요.
+        백테스트 등급 B 이상, 모의투자 승률 50% 이상을 확인한 후 소액부터 시작하길 권장합니다.
+      </div>
+</div>
+</section>
+<!-- ══ 9. 파라미터 설정 ══ -->
+<section class="section" id="trading-params">
+<div class="section-badge">AUTO TRADING</div>
+<h2>⚙️ 자동매매 파라미터 설정</h2>
+<p>파일 상단의 <code style="color:var(--blue)">CONFIG</code> 딕셔너리를 수정합니다.</p>
+<div class="code-block">
+<div class="code-block-label">v1_kiwoom_standard_with_backtest_20260428.py — CONFIG 설정 예시</div>
+<code><span class="nm">CONFIG</span> = {
+    <span class="st">"account"</span>:            <span class="st">""</span>,            <span class="cm"># ← 여기에 계좌번호 입력 (또는 실행 시 팝업)</span>
+<span class="st">"max_stocks"</span>:         <span class="nu">5</span>,            <span class="cm"># 최대 동시 보유 종목</span>
+<span class="st">"total_budget"</span>:       <span class="nu">10_000_000</span>,  <span class="cm"># 총 운용 자금 (원)</span>
+<span class="cm"># ── 단타 설정 ───────────────────────────────────</span>
+<span class="st">"scalp_enabled"</span>:     <span class="kw">True</span>,
+    <span class="st">"scalp_rsi_buy"</span>:     <span class="nu">35</span>,       <span class="cm"># 이 값 이하일 때 과매도 매수</span>
+<span class="st">"scalp_rsi_sell"</span>:    <span class="nu">65</span>,       <span class="cm"># 이 값 이상 + 수익 시 청산</span>
+<span class="st">"scalp_vol_ratio"</span>:   <span class="nu">2.0</span>,      <span class="cm"># 거래량 N배 이상</span>
+<span class="st">"scalp_tp"</span>:          <span class="nu">0.025</span>,    <span class="cm"># 익절 +2.5%</span>
+<span class="st">"scalp_sl"</span>:          <span class="nu">0.015</span>,    <span class="cm"># 손절 -1.5%</span>
+<span class="st">"scalp_budget_pct"</span>:  <span class="nu">0.15</span>,     <span class="cm"># 종목당 자금 비중 15%</span>
+<span class="cm"># ── 스윙 설정 ───────────────────────────────────</span>
+<span class="st">"swing_enabled"</span>:     <span class="kw">True</span>,
+    <span class="st">"swing_tp"</span>:          <span class="nu">0.10</span>,     <span class="cm"># 익절 +10%</span>
+<span class="st">"swing_sl"</span>:          <span class="nu">0.05</span>,     <span class="cm"># 손절 -5%</span>
+<span class="st">"swing_hold_days"</span>:   <span class="nu">10</span>,       <span class="cm"># 최대 보유 영업일</span>
+<span class="st">"swing_budget_pct"</span>:  <span class="nu">0.20</span>,     <span class="cm"># 종목당 자금 비중 20%</span>
+}</code>
+</div>
+</section>
+<!-- ══ 10. 백테스트 개요 ══ -->
+<section class="section" id="bt-overview">
+<div class="section-badge">BACKTEST</div>
+<h2>📊 백테스트 엔진 개요</h2>
+<p>일봉(OHLCV) 데이터를 사용한 단타·스윙 전략 시뮬레이션 엔진입니다. Look-ahead bias를 완전 차단하여 신뢰성 있는 검증을 제공합니다.</p>
+<div class="card-grid">
+<div class="card">
+<div class="card-icon">📡</div>
+<div class="card-title">데이터 자동 폴백</div>
+<div class="card-desc">yfinance → FinanceDataReader → pykrx → CSV 순서로 자동 시도. 성공 데이터는 캐시 저장</div>
+</div>
+<div class="card">
+<div class="card-icon">🚫</div>
+<div class="card-title">Look-ahead Bias 차단</div>
+<div class="card-desc">전날 지표로 신호 판단, 당일 시가로 매수. 미래 데이터를 참조하지 않음</div>
+</div>
+<div class="card">
+<div class="card-icon">💸</div>
+<div class="card-title">실제 거래 비용 반영</div>
+<div class="card-desc">수수료 0.015%, 거래세 0.20%, 슬리피지 0.05% 적용</div>
+</div>
+<div class="card">
+<div class="card-icon">🔄</div>
+<div class="card-title">Walk-Forward 검증</div>
+<div class="card-desc">전체 기간을 5구간으로 나눠 오버피팅 방지 검증</div>
+</div>
+</div>
+<h3>백테스트 시뮬레이션 방식 (단타)</h3>
+<div class="flow">
+<div class="flow-box blue">전날 RSI·거래량으로<br/>매수 신호 판단</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">당일 시가 + 슬리피지로 매수</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box green">당일 고가 ≥ 익절가 → 익절</div>
+<div class="flow-arrow"> / </div>
+<div class="flow-box red">당일 저가 ≤ 손절가 → 손절</div>
+</div>
+<p style="margin-top:12px;font-size:12px;color:var(--text2)">고가·저가 동시 도달(갭이 큰 날) → 보수적으로 손절 처리 | 미청산 → 당일 종가로 시간청산</p>
+</section>
+<!-- ══ 11. GUI에서 실행 ══ -->
+<section class="section" id="bt-gui">
+<div class="section-badge">BACKTEST</div>
+<h2>🖥️ GUI에서 백테스트 실행</h2>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<div class="step-title">백테스트 버튼 클릭</div>
+<div class="step-desc">메인 창 상단의 <strong style="color:var(--green)">📊 백테스트 실행</strong> 버튼을 클릭합니다. 별도 창이 열립니다.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<div class="step-title">설정 입력</div>
+<div class="step-desc">
+<table class="param-table" style="margin-top:8px">
+<tr><th>항목</th><th>기본값</th><th>설명</th></tr>
+<tr><td>시작일</td><td>2020-01-01</td><td>YYYY-MM-DD 형식</td></tr>
+<tr><td>종료일</td><td>2024-12-31</td><td>YYYY-MM-DD 형식</td></tr>
+<tr><td>초기 자금</td><td>10,000,000</td><td>원 단위 입력</td></tr>
+<tr><td>데이터 소스</td><td>auto</td><td>auto 권장 (자동 폴백)</td></tr>
+<tr><td>실행 모드</td><td>backtest</td><td>backtest 또는 optimize</td></tr>
+<tr><td>테스트 종목</td><td>5개</td><td>코드:이름 형식, 줄바꿈 구분</td></tr>
+</table>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<div class="step-title">종목 입력 형식</div>
+<div class="step-desc">종목 입력창에 아래와 같이 한 줄에 하나씩 입력합니다.</div>
+<div class="code-block" style="margin-top:10px">
+<code>005930:삼성전자
+000660:SK하이닉스
+035720:카카오
+005380:현대차
+051910:LG화학</code>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<div class="step-title">▶ 실행 클릭</div>
+<div class="step-desc">백그라운드 스레드로 실행되므로 자동매매 화면에 영향이 없습니다. 완료 후 <strong>📂 결과 폴더 열기</strong> 버튼으로 HTML 리포트를 확인합니다.</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ══ 12. 명령줄 실행 ══ -->
+<section class="section" id="bt-cmdline">
+<div class="section-badge">BACKTEST</div>
+<h2>💻 명령줄(CMD)에서 실행</h2>
+<p>백테스트 파일은 독립 실행도 가능합니다. OpenAPI 없이 64bit Python에서도 동작합니다.</p>
+<div class="code-block">
+<div class="code-block-label">기본 백테스트 (5개 종목, 2020~2024)</div>
+<code>python v1_backtest_20260427.py</code>
+</div>
+<div class="code-block">
+<div class="code-block-label">기간 지정</div>
+<code>python v1_backtest_20260427.py --start 2022-01-01 --end 2024-12-31</code>
+</div>
+<div class="code-block">
+<div class="code-block-label">데이터 소스 지정</div>
+<code>python v1_backtest_20260427.py --source fdr</code>
+</div>
+<div class="code-block">
+<div class="code-block-label">파라미터 최적화 (단일 종목)</div>
+<code>python v1_backtest_20260427.py --mode optimize --code 005930</code>
+</div>
+<div class="code-block">
+<div class="code-block-label">캐시 삭제 후 새로 다운로드</div>
+<code>python v1_backtest_20260427.py --clear-cache</code>
+</div>
+<h3>CSV 파일 사용법 (오프라인)</h3>
+<p>인터넷 없이 키움 HTS에서 내보낸 CSV를 사용합니다.</p>
+<div class="code-block">
+<div class="code-block-label">CSV 파일 위치 &amp; 형식</div>
+<code><span class="cm"># 위치: backtest_data/코드_daily.csv</span>
+<span class="cm"># 예:   backtest_data/005930_daily.csv</span>
+<span class="cm"># 필수 컬럼 (헤더)</span>
+date,open,high,low,close,volume
+
+<span class="cm"># 날짜 형식: YYYY-MM-DD 또는 YYYYMMDD 모두 허용</span>
+2024-01-02,72800,73900,72300,73500,15234567
+
+<span class="cm"># 실행</span>
+python v1_backtest_20260427.py --source csv</code>
+</div>
+</section>
+<!-- ══ 13. 백테스트 파라미터 ══ -->
+<section class="section" id="bt-params">
+<div class="section-badge">BACKTEST</div>
+<h2>⚙️ 백테스트 파라미터 (BT_CFG)</h2>
+<p>파일 내 <code style="color:var(--blue)">BT_CFG</code> 딕셔너리에서 설정합니다. GUI 실행 시 설정창에서 변경도 가능합니다.</p>
+<h3>단타 전략 파라미터</h3>
+<table class="param-table">
+<tr><th>파라미터</th><th>기본값</th><th>설명</th></tr>
+<tr><td>scalp_rsi_period</td><td>14</td><td>RSI 계산 기간</td></tr>
+<tr><td>scalp_rsi_buy</td><td>35</td><td>이 값 이하일 때 과매도 매수 신호</td></tr>
+<tr><td>scalp_rsi_sell</td><td>65</td><td>이 값 이상 + 최소 수익 시 청산</td></tr>
+<tr><td>scalp_vol_ratio</td><td>2.0</td><td>5일 평균 대비 거래량 배율 기준</td></tr>
+<tr><td>scalp_tp</td><td>0.025</td><td>익절선 +2.5%</td></tr>
+<tr><td>scalp_sl</td><td>0.015</td><td>손절선 -1.5%</td></tr>
+<tr><td>scalp_budget_pct</td><td>0.15</td><td>종목당 투입 자금 비중</td></tr>
+<tr><td>scalp_cooldown_days</td><td>2</td><td>손절 후 재진입 대기 영업일</td></tr>
+</table>
+<h3>스윙 전략 파라미터</h3>
+<table class="param-table">
+<tr><th>파라미터</th><th>기본값</th><th>설명</th></tr>
+<tr><td>swing_ma_short</td><td>20</td><td>단기 이동평균선 기간</td></tr>
+<tr><td>swing_ma_long</td><td>60</td><td>장기 이동평균선 기간</td></tr>
+<tr><td>swing_macd_fast/slow/sig</td><td>12/26/9</td><td>MACD 파라미터</td></tr>
+<tr><td>swing_tp</td><td>0.10</td><td>익절선 +10%</td></tr>
+<tr><td>swing_sl</td><td>0.05</td><td>손절선 -5%</td></tr>
+<tr><td>swing_hold_days</td><td>10</td><td>최대 보유 영업일 (초과 시 강제 청산)</td></tr>
+<tr><td>swing_budget_pct</td><td>0.20</td><td>종목당 투입 자금 비중</td></tr>
+</table>
+<h3>거래 비용 파라미터</h3>
+<table class="param-table">
+<tr><th>파라미터</th><th>기본값</th><th>설명</th></tr>
+<tr><td>commission_rate</td><td>0.00015</td><td>증권사 수수료 0.015% (매수·매도 각각)</td></tr>
+<tr><td>tax_rate_sell</td><td>0.0020</td><td>증권거래세 0.20% (매도 시)</td></tr>
+<tr><td>slippage_rate</td><td>0.0005</td><td>시장가 체결 오차 슬리피지 0.05%</td></tr>
+</table>
+</section>
+<!-- ══ 14. 결과 읽는 법 ══ -->
+<section class="section" id="bt-output">
+<div class="section-badge">BACKTEST</div>
+<h2>📄 결과 읽는 법</h2>
+<p>백테스트 완료 후 <code>backtest_results/</code> 폴더에 아래 파일들이 생성됩니다.</p>
+<table class="param-table">
+<tr><th>파일</th><th>내용</th></tr>
+<tr><td>bt_report_날짜.html</td><td>종합 리포트 (브라우저로 열기). 모든 지표와 차트 포함</td></tr>
+<tr><td>bt_chart_날짜.png</td><td>자산 곡선, 낙폭, 월별 손익, Walk-Forward 차트 이미지</td></tr>
+<tr><td>bt_trades_날짜.json</td><td>전체 매매 내역 (매수일/매도일/가격/수량/손익/이유)</td></tr>
+<tr><td>bt_optimize_코드.csv</td><td>최적화 모드 실행 시 파라미터별 성과 비교표</td></tr>
+</table>
+<h3>주요 성과 지표 설명</h3>
+<table class="param-table">
+<tr><th>지표</th><th>의미</th><th>기준</th></tr>
+<tr><td>승률 (Win Rate)</td><td>전체 매매 중 수익 건수 비율</td><td>50% 이상 권장</td></tr>
+<tr><td>손익비 (P/L Ratio)</td><td>평균 수익 / 평균 손실</td><td>1.0 이상 필요, 1.5 이상 우수</td></tr>
+<tr><td>CAGR</td><td>연환산 복리 수익률</td><td>코스피(연 8~10%) 초과 목표</td></tr>
+<tr><td>MDD (Max Drawdown)</td><td>최대 낙폭. 자산 고점 대비 최대 하락률</td><td>-20% 이내 권장</td></tr>
+<tr><td>샤프 지수</td><td>위험 대비 초과 수익 (무위험 3% 가정)</td><td>1.0 이상 우수</td></tr>
+<tr><td>칼마 비율</td><td>CAGR ÷ |MDD|. 낙폭 대비 수익</td><td>0.5 이상 권장</td></tr>
+<tr><td>알파</td><td>코스피 대비 연환산 초과 수익</td><td>양수이면 시장 수익률 초과</td></tr>
+</table>
+</section>
+<!-- ══ 15. 등급 기준 ══ -->
+<section class="section" id="bt-grade">
+<div class="section-badge">BACKTEST</div>
+<h2>🏆 전략 등급 기준</h2>
+<div class="grade-table">
+<div class="grade-cell">
+<div class="grade-letter" style="color:var(--green)">A</div>
+<div class="grade-desc">승률 ≥55%<br/>MDD &gt;-15%<br/>샤프 ≥1.2<br/>알파 양수<br/><strong style="color:var(--green)">실전 투입 검토</strong></div>
+</div>
+<div class="grade-cell">
+<div class="grade-letter" style="color:var(--blue)">B</div>
+<div class="grade-desc">승률 ≥50%<br/>MDD &gt;-20%<br/>샤프 ≥0.8<br/><strong style="color:var(--blue)">소액 실전 테스트</strong></div>
+</div>
+<div class="grade-cell">
+<div class="grade-letter" style="color:var(--yellow)">C</div>
+<div class="grade-desc">승률 ≥45%<br/>MDD &gt;-25%<br/><strong style="color:var(--yellow)">전략 개선 필요</strong></div>
+</div>
+<div class="grade-cell">
+<div class="grade-letter" style="color:var(--orange)">D</div>
+<div class="grade-desc">승률 ≥40%<br/><strong style="color:var(--orange)">전략 재설계</strong></div>
+</div>
+<div class="grade-cell">
+<div class="grade-letter" style="color:var(--red)">F</div>
+<div class="grade-desc">승률 &lt;40%<br/><strong style="color:var(--red)">실전 불가</strong></div>
+</div>
+</div>
+<div class="alert alert-info">
+<div class="alert-icon">💡</div>
+<div class="alert-body">
+<div class="alert-title">Walk-Forward 검증 해석</div>
+        5개 구간 모두에서 승률이 유사하게 유지되면 오버피팅 가능성이 낮습니다. 특정 구간에서만 좋은 결과가 나왔다면 해당 기간에만 맞춰진 전략일 수 있습니다.
+      </div>
+</div>
+</section>
+<!-- ══ 16. 파라미터 최적화 ══ -->
+<section class="section" id="optimize">
+<div class="section-badge">ADVANCED</div>
+<h2>🔬 파라미터 최적화 (그리드 서치)</h2>
+<p>단타 전략의 주요 파라미터를 자동으로 탐색하여 최적 조합을 찾습니다.</p>
+<div class="code-block">
+<div class="code-block-label">최적화 대상 파라미터 그리드</div>
+<code><span class="nm">GRID</span> = {
+    <span class="st">"scalp_rsi_buy"</span>:   [<span class="nu">30</span>, <span class="nu">33</span>, <span class="nu">35</span>, <span class="nu">38</span>, <span class="nu">40</span>],       <span class="cm"># 5가지</span>
+<span class="st">"scalp_tp"</span>:         [<span class="nu">0.020</span>, <span class="nu">0.025</span>, <span class="nu">0.030</span>, <span class="nu">0.035</span>],  <span class="cm"># 4가지</span>
+<span class="st">"scalp_sl"</span>:         [<span class="nu">0.010</span>, <span class="nu">0.012</span>, <span class="nu">0.015</span>, <span class="nu">0.018</span>],  <span class="cm"># 4가지</span>
+<span class="st">"scalp_vol_ratio"</span>:  [<span class="nu">1.5</span>, <span class="nu">2.0</span>, <span class="nu">2.5</span>],               <span class="cm"># 3가지</span>
+}
+<span class="cm"># 총 조합: 5 × 4 × 4 × 3 = 240가지 (tp &gt; sl 조건 필터링 후 ~180가지)</span></code>
+</div>
+<h3>최적화 점수 산식</h3>
+<div class="code-block">
+<code><span class="nm">score</span> = (승률/100) × 손익비 / (|MDD|/10) × max(샤프, 0.1)</code>
+</div>
+<p>점수가 높을수록 수익성, 안정성, 위험 대비 효율이 모두 좋은 파라미터입니다. 결과는 <code>backtest_results/bt_optimize_코드.csv</code>에 저장됩니다.</p>
+<div class="alert alert-warn">
+<div class="alert-icon">⚠️</div>
+<div class="alert-body">
+<div class="alert-title">최적화 결과 과신 주의</div>
+        최적화된 파라미터는 과거 데이터에 맞춰진 것입니다. 반드시 Walk-Forward 검증으로 미래 성과도 확인 후 사용하세요. Top 1보다는 Top 3~5의 평균적인 파라미터를 채택하는 것이 더 안정적입니다.
+      </div>
+</div>
+</section>
+<!-- ══ 17. EXE 빌드 ══ -->
+<section class="section" id="exe-build">
+<div class="section-badge">ADVANCED</div>
+<h2>📦 EXE 실행파일 빌드</h2>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<div class="step-title">build_exe.bat 실행</div>
+<div class="step-desc">프로젝트 폴더에서 <code>build_exe.bat</code>를 더블클릭합니다. <strong>반드시 32bit Python 3.9 환경</strong>이어야 합니다.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<div class="step-title">자동 빌드 (약 3~5분)</div>
+<div class="step-desc">패키지 설치 → PyInstaller 실행 → 단일 EXE 생성 → 임시 파일 정리 순으로 진행됩니다.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<div class="step-title">결과물 확인</div>
+<div class="step-desc"><code>dist/키움자동매매_백테스트_v1.exe</code> 파일이 생성됩니다. 이 파일만 배포하면 됩니다.</div>
+</div>
+</div>
+</div>
+<div class="two-col">
+<div class="col-box">
+<h4>✅ EXE 빌드 주의사항</h4>
+<ul>
+<li>32bit Python 3.9 환경에서 빌드</li>
+<li>키움 OpenAPI+ 설치된 PC에서 빌드</li>
+<li>아이콘: kiwoom.ico를 같은 폴더에 두면 자동 적용</li>
+<li>빌드 오류 시 build/warn*.txt 확인</li>
+</ul>
+</div>
+<div class="col-box">
+<h4>📌 EXE 실행 환경</h4>
+<ul>
+<li>키움 OpenAPI+ 설치된 PC 필요</li>
+<li>백테스트 기능은 OpenAPI 없이도 동작</li>
+<li>antivirus 오탐 가능 → 예외 등록 필요</li>
+<li>로그 파일은 EXE 위치에 생성됨</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- ══ 18. FAQ ══ -->
+<section class="section" id="faq">
+<div class="section-badge">SUPPORT</div>
+<h2>❓ 자주 묻는 질문</h2>
+<h3>Q. 조건검색식이 로드되지 않습니다</h3>
+<p>영웅문에 저장된 조건검색식 이름이 <code>CONDITION_NAMES</code>와 정확히 일치해야 합니다. 띄어쓰기·대소문자·특수문자를 포함해 완전히 동일해야 합니다. <strong>📋 조건검색식 목록</strong> 버튼으로 현재 로드된 목록을 확인하세요.</p>
+<h3>Q. 백테스트에서 "데이터 없음"이 나옵니다</h3>
+<p>yfinance, FinanceDataReader, pykrx 모두 실패한 경우입니다. 인터넷 연결을 확인하고 <code>--clear-cache</code> 옵션으로 재시도하세요. 지속 실패 시 HTS에서 CSV를 직접 내보내어 <code>backtest_data/</code>에 넣고 <code>--source csv</code>로 실행하세요.</p>
+<h3>Q. PyQt5 import 오류가 발생합니다</h3>
+<p>64bit Python에서는 키움 OpenAPI+ DLL을 로드할 수 없습니다. 32bit Python 3.9를 별도 설치하거나, 백테스트만 사용할 경우 64bit 환경에서 <code>v1_backtest_20260427.py</code>를 직접 실행하세요.</p>
+<h3>Q. 빌드한 EXE에서 바이러스 경고가 뜹니다</h3>
+<p>PyInstaller로 패키징한 EXE는 일부 백신에서 오탐이 발생합니다. Windows Defender 또는 사용 중인 백신에서 해당 파일을 예외 등록하거나, 서명 인증서를 적용하면 해결됩니다.</p>
+<h3>Q. 캐시를 초기화하려면?</h3>
+<div class="code-block">
+<code><span class="cm"># 방법 1: 명령줄</span>
+python v1_backtest_20260427.py --clear-cache
+
+<span class="cm"># 방법 2: 폴더 직접 삭제</span>
+backtest_cache/ 폴더 삭제</code>
+</div>
+<h3>Q. 매매 로그는 어디서 확인하나요?</h3>
+<p>실행 폴더의 <code>log_standard_날짜.txt</code> 파일에 저장됩니다. GUI 내 로그 창에도 실시간으로 표시됩니다.</p>
+</section>
+<!-- ══ 19. 변경 이력 ══ -->
+<section class="section" id="changelog">
+<div class="section-badge">CHANGELOG</div>
+<h2>📋 변경 이력</h2>
+<table class="param-table">
+<tr><th>버전</th><th>날짜</th><th>변경 내용</th></tr>
+<tr>
+<td>통합본 v1</td>
+<td>2026-04-28</td>
+<td>
+<span class="badge badge-green">NEW</span> v1_backtest_20260427 엔진 통합<br/>
+<span class="badge badge-green">NEW</span> 📊 백테스트 GUI 버튼 추가<br/>
+<span class="badge badge-green">NEW</span> BacktestDialog 창 (백그라운드 실행)<br/>
+<span class="badge badge-green">NEW</span> build_exe.bat EXE 빌드 스크립트
+        </td>
+</tr>
+<tr>
+<td>Standard v2.0</td>
+<td>2026-04-21</td>
+<td>
+<span class="badge badge-red">FIX</span> time.sleep → QTimer 교체 (이벤트루프 블로킹 해결)<br/>
+<span class="badge badge-red">FIX</span> 조건검색 결과 실시간 시세 등록 누락 수정<br/>
+<span class="badge badge-red">FIX</span> 스윙 전략 단타 쿨다운 미적용 수정<br/>
+<span class="badge badge-yellow">IMP</span> _is_safe() API 과호출 개선<br/>
+<span class="badge badge-yellow">IMP</span> 공휴일 반영한 영업일 계산
+        </td>
+</tr>
+<tr>
+<td>Backtest v1</td>
+<td>2026-04-27</td>
+<td>
+<span class="badge badge-green">NEW</span> yfinance → FDR → pykrx 데이터 폴백<br/>
+<span class="badge badge-green">NEW</span> Walk-Forward 검증 (5구간)<br/>
+<span class="badge badge-green">NEW</span> HTML 리포트 + PNG 차트<br/>
+<span class="badge badge-green">NEW</span> 그리드 서치 최적화 엔진
+        </td>
+</tr>
+</table>
+<div class="alert alert-green" style="margin-top:32px">
+<div class="alert-icon">📌</div>
+<div class="alert-body">
+<div class="alert-title">면책 고지</div>
+        이 시스템의 백테스트 결과는 일봉 데이터 기반 시뮬레이션입니다. 과거 성과가 미래 수익을 보장하지 않습니다.
+        단타 전략은 실제 5분봉 체결과 결과가 다를 수 있습니다. 반드시 모의투자 검증 후 소액부터 실전에 투입하세요.
+      </div>
+</div>
+</section>
+</main>
+<a class="scroll-top" href="#">↑</a>
+<script>
+// 활성 메뉴 하이라이트
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('nav a');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// 부드러운 스크롤
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>

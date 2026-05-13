@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔐 Firebase 설정 가이드</title>
+<style>
+:root{--bg:#fffaf5;--panel:#ffffff;--line:#eadfd3;--text:#2d2925;--muted:#7f7166;--accent:#d88f7c;--accent2:#6b63d8;--soft:#f6eee6;}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;line-height:1.75;word-break:keep-all;}
+main{width:min(980px,100%);margin:0 auto;padding:28px 18px 60px}.topbar{position:sticky;top:0;z-index:5;background:rgba(255,250,245,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 18px}.topbar-inner{width:min(980px,100%);margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.backlink{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);font-weight:800;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px}.backlink:hover{border-color:var(--accent);color:#9d5546}.badge{font-size:12px;color:var(--muted)}.hero{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,#fff,#fff4eb);padding:26px;margin-bottom:20px;box-shadow:0 10px 30px rgba(80,50,20,.05)}h1{font-size:30px;margin:0 0 8px;line-height:1.25}h2{font-size:22px;margin:26px 0 10px;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:18px;margin:22px 0 8px;color:#7657c8}p{margin:0 0 12px;color:var(--muted)}.card{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:22px;margin:14px 0;box-shadow:0 8px 24px rgba(80,50,20,.04)}.note,.ok,.warn,.path{border-radius:16px;padding:15px 16px;margin:14px 0;border:1px solid var(--line);background:var(--soft)}.ok{background:#effaf1;border-color:#cae9cf}.warn{background:#fff3e0;border-color:#eed0a5}.path{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f8f5ff;border-color:#d9d1ff;color:#4d4296}pre,.code,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;word-break:break-word}.code{background:#28211f;color:#fff8ef;border-radius:14px;padding:16px;overflow:auto;margin:14px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.link-list{display:grid;gap:12px}.doc-link{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:18px;background:#fff;text-decoration:none;color:var(--text);padding:16px;transition:.15s}.doc-link:hover{transform:translateY(-1px);border-color:var(--accent)}.doc-link .ico{width:42px;height:42px;border-radius:14px;background:#f3e7df;display:grid;place-items:center;font-size:20px;flex:none}.doc-link strong{display:block;font-size:16px}.doc-link span:last-child{display:block;color:var(--muted);font-size:13px;margin-top:2px}.footer{margin-top:36px;text-align:center;color:var(--muted);font-size:12px}@media(max-width:640px){main{padding:18px 14px 48px}.hero{padding:20px;border-radius:20px}h1{font-size:25px}h2{font-size:20px}.card{padding:18px;border-radius:18px}.topbar{padding:10px 12px}.backlink{width:100%;justify-content:center}.doc-link{padding:14px}.doc-link .ico{width:38px;height:38px;font-size:18px}}
+</style>
+
+</head>
+<body>
+<div class="topbar"><div class="topbar-inner"><a class="backlink" href="../index.html">← 문서 보관함으로 돌아가기</a><span class="badge">web-test 전용 문서 · docs 폴더 분리형</span></div></div>
+<main>
+  <section class="hero"><h1>🔐 Firebase 설정 가이드</h1><p>Authentication, 승인 도메인, Firestore Rules, web-test 전용 저장 경로를 확인하는 초보자용 문서입니다.</p></section>
+  <article class="card">
+<h2>이 문서의 목적</h2>
+<p>이 블로그는 기존 블로그와 섞이지 않도록 <strong>web-test 전용 저장 위치</strong>만 사용합니다. Firebase에서 로그인한 사람의 UID 아래에 site 문서를 만들고, 그 안에 블로그 데이터를 저장합니다.</p>
+<div class="path"><strong>반드시 유지할 저장 경로</strong><br/>users / 로그인한 사용자 UID / sites / web-test</div>
+<div class="warn">주의: 기존 블로그에서 쓰던 저장 경로와 섞으면 안 됩니다. 이 파일은 web-test 전용으로 <strong>sites / web-test</strong> 문서만 사용해야 합니다.</div>
+<h3>1단계. Firebase Authentication 확인</h3>
+<ol>
+<li>Firebase 콘솔에서 프로젝트 <strong>Icookiekid-GPT</strong>를 엽니다.</li>
+<li>왼쪽 메뉴에서 <strong>Authentication</strong>을 누릅니다.</li>
+<li>Sign-in method에서 <strong>Email/Password</strong>가 사용 설정되어 있는지 확인합니다.</li>
+<li>이 블로그는 별도 관리자 비밀번호를 쓰지 않고 Firebase 이메일/비밀번호 로그인만 사용합니다.</li>
+</ol>
+<h3>2단계. Authorized domains 확인</h3>
+<p>GitHub Pages 주소에서 Firebase 로그인이 되려면 승인된 도메인에 아래 주소가 있어야 합니다.</p>
+<div class="code">icookiekid.github.io</div>
+<p>이미 등록되어 있으면 그대로 두시면 됩니다.</p>
+<h3>3단계. Firestore Rules 확인</h3>
+<p>Firestore 규칙은 로그인한 사용자 본인의 UID 아래 데이터만 읽고 쓸 수 있게 되어 있어야 합니다.</p>
+<div class="code">rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null
+                         &amp;&amp; request.auth.uid == userId;
+    }
+  }
+}</div>
+<p>이 규칙은 <strong>로그인한 사용자 UID와 경로의 userId가 같을 때만</strong> 저장과 불러오기를 허용합니다.</p>
+<h3>4단계. 저장 위치 확인</h3>
+<ol>
+<li>블로그 상단의 <strong>☁️ 동기화</strong> 메뉴로 이동합니다.</li>
+<li>Firebase 이메일/비밀번호로 로그인합니다.</li>
+<li><strong>Firebase에 저장</strong>을 누릅니다.</li>
+<li>Firebase 콘솔 Firestore Database에서 아래 구조를 확인합니다.</li>
+</ol>
+<div class="code">users
+└─ 내 UID
+   └─ sites
+      └─ web-test</div>
+<div class="ok">정상이라면 web-test 문서 안에 payload, ownerUid, ownerEmail, updatedAt 같은 값이 보입니다.</div>
+</article>
+  <div class="footer">최종 생성일자: 2026-05-13 23:31:53 KST</div>
+</main>
+</body>
+</html>
