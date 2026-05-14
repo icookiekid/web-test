@@ -2,7 +2,7 @@
 
 <html lang="ko">
 <head>
-<!-- web-test Firebase 수정본 Ver18: 모바일 속도 개선을 위해 큰 문서를 docs 폴더로 분리, Firestore 저장 경로 users/{uid}/sites/web-test 유지, 생성 2026-05-13 23:31:53 KST -->
+<!-- web-test Firebase 수정본 Ver19: 파일 분리 구조 각 파일 설명서를 docs 폴더에 추가, 기존 설명 문서 유지, Firestore 저장 경로 users/{uid}/sites/web-test 유지, 생성 2026-05-14 11:41:56 KST -->
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>나의 블로그</title>
@@ -1345,6 +1345,9 @@
 <button class="nav-subitem" onclick="location.href='docs/change_ver18.html';">
 <span class="nav-icon">📝</span><span>변경사항</span>
 </button>
+<button class="nav-subitem" onclick="location.href='docs/file_structure_guide.html';">
+<span class="nav-icon">📁</span><span>파일 구조 설명</span>
+</button>
 <button class="nav-subitem" onclick="location.href='docs/index_code_guide.html';">
 <span class="nav-icon">💻</span><span>index 코드 해설</span>
 </button>
@@ -1407,11 +1410,19 @@
 <p class="section-desc">이 블로그의 메인 공간입니다. 앞으로 자료와 매뉴얼을 이곳에 세로 목록 형태로 정리해 보관합니다.</p>
 <div class="docs-home">
 <div class="docs-note">
-        Firebase 로그인·저장·불러오기는 상단 <strong>☁️ 동기화</strong> 메뉴에서 관리합니다. 문서 자료는 모바일 속도를 위해 <strong>docs 폴더의 별도 HTML 파일</strong>로 분리했습니다.
+        Firebase 로그인·저장·불러오기는 상단 <strong>☁️ 동기화</strong> 메뉴에서 관리합니다. 문서 자료는 모바일 속도를 위해 <strong>docs 폴더의 별도 HTML 파일</strong>로 분리했습니다. 새로 추가한 <strong>파일 분리 구조 각 파일 설명서</strong>에서 각 파일 역할을 확인할 수 있습니다.
       </div>
 <div class="docs-section-block" id="study-docs">
 <h2 class="docs-block-title"><span class="docs-heading-icon">💻</span> 블로그 공부 자료</h2>
 <div class="docs-menu-list">
+<button class="docs-menu-card" onclick="location.href='docs/file_structure_guide.html'" type="button">
+<span class="docs-menu-icon">📁</span>
+<span class="docs-menu-body">
+<span class="docs-menu-title">파일 분리 구조 각 파일 설명서</span>
+<span class="docs-menu-desc">index.html과 docs 폴더 안의 각 파일이 어떤 역할을 하는지 초보자 기준으로 정리했습니다.</span>
+</span>
+<span class="docs-menu-arrow">›</span>
+</button>
 <button class="docs-menu-card" onclick="location.href='docs/index_code_guide.html'" type="button">
 <span class="docs-menu-icon">💻</span>
 <span class="docs-menu-body">
@@ -3761,6 +3772,6 @@ document.addEventListener('keydown', (e) => {
     }
   };
 </script>
-<!-- 최종 생성일자: 2026-05-13 23:31:53 KST / web-test 전용 / 문서 파일 분리형 / Firebase 경로: users/{UID}/sites/web-test -->
+<!-- 최종 생성일자: 2026-05-14 11:41:56 KST / web-test 전용 / 문서 파일 분리형 / 파일 구조 설명서 추가 / Firebase 경로: users/{UID}/sites/web-test -->
 </body>
 </html>

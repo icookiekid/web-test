@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📁 web-test 파일 분리 구조 각 파일 설명서</title>
+<style>
+:root{--bg:#fffaf5;--panel:#ffffff;--line:#eadfd3;--text:#2d2925;--muted:#7f7166;--accent:#d88f7c;--accent2:#6b63d8;--soft:#f6eee6;--good:#effaf1;--warn:#fff3e0;--code:#28211f;}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;line-height:1.75;word-break:keep-all;}
+main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 70px}.topbar{position:sticky;top:0;z-index:10;background:rgba(255,250,245,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 18px}.topbar-inner{width:min(1100px,100%);margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.backlink{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);font-weight:800;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px}.backlink:hover{border-color:var(--accent);color:#9d5546}.badge{font-size:12px;color:var(--muted)}
+.hero{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,#fff,#fff4eb);padding:28px;margin-bottom:20px;box-shadow:0 10px 30px rgba(80,50,20,.05)}h1{font-size:32px;margin:0 0 8px;line-height:1.25}h2{font-size:23px;margin:30px 0 12px;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:18px;margin:22px 0 8px;color:#7657c8}p{margin:0 0 12px;color:var(--muted)}ul,ol{padding-left:22px}.card{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:22px;margin:14px 0;box-shadow:0 8px 24px rgba(80,50,20,.04)}.note,.ok,.warn,.path{border-radius:16px;padding:15px 16px;margin:14px 0;border:1px solid var(--line);background:var(--soft)}.ok{background:var(--good);border-color:#cae9cf}.warn{background:var(--warn);border-color:#eed0a5}.path{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f8f5ff;border-color:#d9d1ff;color:#4d4296;white-space:pre-wrap;word-break:break-word}.code,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.code{background:var(--code);color:#fff8ef;border-radius:14px;padding:16px;overflow:auto;margin:14px 0;white-space:pre-wrap;word-break:break-word}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.mini{font-size:13px;color:var(--muted)}.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:18px 0}.toc a{display:block;text-decoration:none;color:var(--text);background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px;font-weight:800}.toc a:hover{border-color:var(--accent)}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:#fff;margin:14px 0}table{width:100%;border-collapse:collapse;min-width:900px}th,td{border-bottom:1px solid var(--line);padding:12px 13px;text-align:left;vertical-align:top}th{background:#f7eee6;color:#5f5248;font-size:13px}td{font-size:14px}tr:last-child td{border-bottom:0}.file-tree{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;overflow:auto;white-space:pre;line-height:1.65}.checklist li{margin:7px 0}.footer{margin-top:38px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:640px){main{padding:18px 14px 52px}.hero{padding:20px;border-radius:20px}h1{font-size:25px}h2{font-size:20px}.card{padding:18px;border-radius:18px}.topbar{padding:10px 12px}.backlink{width:100%;justify-content:center}.badge{width:100%;text-align:center}.toc{grid-template-columns:1fr}table{min-width:720px}th,td{font-size:13px;padding:10px}.file-tree{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="topbar-inner"><a class="backlink" href="../index.html">← 문서 보관함으로 돌아가기</a><span class="badge">web-test 전용 · 파일 분리 구조 설명서 · Ver19</span></div></div>
+<main>
+<section class="hero">
+  <h1>📁 web-test 파일 분리 구조 각 파일 설명서</h1>
+  <p>기존에는 큰 문서와 코드 해설을 <strong>index.html 하나</strong>에 모두 넣었습니다. 지금은 모바일 속도를 위해 <strong>index.html + docs 폴더</strong> 구조로 분리했습니다. 이 문서는 각 파일이 어떤 역할을 하는지 초보자 기준으로 설명합니다.</p>
+</section>
+
+<nav class="toc">
+  <a href="#why">1. 왜 파일을 나눴나요?</a>
+  <a href="#tree">2. 현재 폴더 구조</a>
+  <a href="#files">3. 각 파일 역할</a>
+  <a href="#upload">4. GitHub 업로드 방법</a>
+  <a href="#edit">5. 수정할 때 기준</a>
+  <a href="#trouble">6. 오류가 날 때 확인</a>
+</nav>
+
+<section id="why" class="card">
+  <h2>1. 왜 파일을 나눴나요?</h2>
+  <p>처음에는 GitHub에 <code>index.html</code> 하나만 올리면 되도록 모든 내용을 한 파일 안에 넣었습니다. 하지만 코드 한 줄 해설, Firebase 문서, 자동매매 매뉴얼까지 모두 들어가면서 파일이 커졌고, 모바일에서 문서를 클릭할 때 로딩이 느려졌습니다.</p>
+  <div class="grid">
+    <div class="note"><strong>기존 단일 구조</strong><br>올릴 파일은 하나라서 편하지만, 모든 문서를 한 번에 품고 있어서 모바일이 무거워집니다.</div>
+    <div class="ok"><strong>현재 분리 구조</strong><br>메인 화면은 <code>index.html</code>이 담당하고, 큰 문서는 <code>docs</code> 폴더에서 필요할 때만 열립니다.</div>
+  </div>
+  <div class="path">Firebase 저장 경로는 계속 유지합니다.
+users / 로그인한 사용자 UID / sites / web-test</div>
+  <p>중요한 점은 <strong>문서 파일을 분리해도 Firebase 데이터 저장 위치는 바뀌지 않는다</strong>는 것입니다. 기존 블로그의 <code>blogData</code> 경로와 섞지 않습니다.</p>
+</section>
+
+<section id="tree" class="card">
+  <h2>2. 현재 폴더 구조</h2>
+  <p>GitHub의 <code>web-test</code> 폴더 안은 아래처럼 구성되어야 합니다.</p>
+  <div class="file-tree">web-test/
+├─ index.html
+└─ docs/
+   ├─ file_structure_guide.html
+   ├─ index_code_guide.html
+   ├─ firebase_guide.html
+   ├─ firebase_function.html
+   ├─ change_ver18.html
+   ├─ auto_trade_v1_index.html
+   ├─ auto_trade_v1_01.html
+   ├─ auto_trade_v1_02.html
+   ├─ auto_trade_v1_03.html
+   ├─ auto_trade_v1_04.html
+   ├─ auto_trade_v1_05.html
+   ├─ auto_trade_v1_06.html
+   ├─ auto_trade_v1_07.html
+   ├─ auto_trade_v1_08.html
+   ├─ auto_trade_v1_09.html
+   ├─ auto_trade_v1_10.html
+   ├─ auto_trade_v1_11.html
+   ├─ auto_trade_v1_12.html
+   └─ auto_trade_v2_ready.html</div>
+  <div class="warn"><strong>주의:</strong> <code>docs</code> 폴더 이름을 바꾸면 문서 링크가 깨질 수 있습니다. <code>Docs</code>, <code>doc</code>, <code>문서</code>처럼 바꾸지 말고 반드시 <code>docs</code> 그대로 두는 것이 안전합니다.</div>
+</section>
+
+<section id="files" class="card">
+  <h2>3. 각 파일 역할</h2>
+  <p>아래 표는 현재 생성된 파일들이 각각 무슨 역할을 하는지 정리한 것입니다. 기존 설명 파일인 <strong>index.html 코드 한 줄 해설</strong>, <strong>Firebase 설정 가이드</strong>, <strong>함수 사용법</strong>, <strong>변경사항 Ver18</strong>은 그대로 유지했습니다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>파일명</th><th>역할</th><th>설명</th><th>주의사항</th><th>크기</th></tr>
+      </thead>
+      <tbody>
+<tr>
+<td><code>docs/auto_trade_v1_01.html</code></td>
+<td>자동매매 v1 세부 문서 01</td>
+<td>자동매매 v1 매뉴얼의 첫 번째 세부 문서입니다. 자동매매 기능을 단계별로 공부할 때 열어보는 자료입니다.</td>
+<td>문서 자료이므로 Firebase 데이터 저장과 직접 연결되지 않습니다.</td>
+<td>52.2 KB</td>
+</tr>
+<tr>
+<td><code>docs/file_structure_guide.html</code></td>
+<td>파일 분리 구조 각 파일 설명서</td>
+<td>이번에 새로 만든 문서입니다. index.html 단일 구조에서 docs 폴더 분리 구조로 바뀐 뒤 각 파일이 무슨 역할을 하는지 설명합니다.</td>
+<td>문서 보관함에 추가되어 있으며 별도 다운로드도 가능합니다.</td>
+<td>새 문서</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_02.html</code></td>
+<td>자동매매 v1 세부 문서 02</td>
+<td>자동매매 v1 매뉴얼의 두 번째 세부 문서입니다. 앞 문서와 연결되는 설명 자료입니다.</td>
+<td>파일명은 auto_trade_v1_index.html의 링크와 맞아야 합니다.</td>
+<td>35.2 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_03.html</code></td>
+<td>자동매매 v1 세부 문서 03</td>
+<td>자동매매 v1 매뉴얼의 세 번째 세부 문서입니다.</td>
+<td>문서만 바꿀 때는 index.html을 건드리지 않아도 됩니다.</td>
+<td>38.9 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_04.html</code></td>
+<td>자동매매 v1 세부 문서 04</td>
+<td>자동매매 v1 매뉴얼의 네 번째 세부 문서입니다.</td>
+<td>docs 폴더 안에 그대로 두어야 링크가 깨지지 않습니다.</td>
+<td>38.9 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_05.html</code></td>
+<td>자동매매 v1 세부 문서 05</td>
+<td>자동매매 v1 매뉴얼의 다섯 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>28.0 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_06.html</code></td>
+<td>자동매매 v1 세부 문서 06</td>
+<td>자동매매 v1 매뉴얼의 여섯 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>31.8 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_07.html</code></td>
+<td>자동매매 v1 세부 문서 07</td>
+<td>자동매매 v1 매뉴얼의 일곱 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>31.8 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_08.html</code></td>
+<td>자동매매 v1 세부 문서 08</td>
+<td>자동매매 v1 매뉴얼의 여덟 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>21.0 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_09.html</code></td>
+<td>자동매매 v1 세부 문서 09</td>
+<td>자동매매 v1 매뉴얼의 아홉 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>20.9 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_10.html</code></td>
+<td>자동매매 v1 세부 문서 10</td>
+<td>자동매매 v1 매뉴얼의 열 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>21.0 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_11.html</code></td>
+<td>자동매매 v1 세부 문서 11</td>
+<td>자동매매 v1 매뉴얼의 열한 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>20.6 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_12.html</code></td>
+<td>자동매매 v1 세부 문서 12</td>
+<td>자동매매 v1 매뉴얼의 열두 번째 세부 문서입니다.</td>
+<td>자료 보관용 문서입니다.</td>
+<td>20.6 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v1_index.html</code></td>
+<td>자동매매 v1 목차</td>
+<td>자동매매 v1 문서 01~12번으로 이동하는 목차 파일입니다. 문서 보관함에서 v1 매뉴얼을 누르면 이 파일이 열립니다.</td>
+<td>v1 문서를 추가하거나 이름을 바꾸면 이 목차의 링크도 같이 수정해야 합니다.</td>
+<td>6.3 KB</td>
+</tr>
+<tr>
+<td><code>docs/auto_trade_v2_ready.html</code></td>
+<td>자동매매 v2 준비중 문서</td>
+<td>v2 매뉴얼을 나중에 넣기 위해 미리 만들어 둔 안내 문서입니다.</td>
+<td>나중에 실제 v2 문서가 생기면 이 파일을 교체하거나 목차 파일로 바꾸면 됩니다.</td>
+<td>3.9 KB</td>
+</tr>
+<tr>
+<td><code>docs/change_ver18.html</code></td>
+<td>Ver18 변경사항 문서</td>
+<td>index.html 하나에 들어 있던 큰 문서들을 docs 폴더로 분리한 이유와 변경 내용을 설명하는 문서입니다.</td>
+<td>기존 설명 파일로 유지합니다.</td>
+<td>5.0 KB</td>
+</tr>
+<tr>
+<td><code>docs/firebase_function.html</code></td>
+<td>Firebase 함수 사용법</td>
+<td>로그인, 저장, 불러오기, web-test 전용 Firestore 경로 흐름을 설명하는 문서입니다.</td>
+<td>기존 설명 파일로 유지합니다.</td>
+<td>6.1 KB</td>
+</tr>
+<tr>
+<td><code>docs/firebase_guide.html</code></td>
+<td>Firebase 설정 가이드</td>
+<td>Firebase Authentication, Authorized domains, Firestore Rules를 초보자 기준으로 확인하는 문서입니다.</td>
+<td>기존 설명 파일로 유지합니다.</td>
+<td>6.3 KB</td>
+</tr>
+<tr>
+<td><code>docs/index_code_guide.html</code></td>
+<td>index.html 코드 한 줄 해설</td>
+<td>현재 블로그의 index.html 코드를 공부하기 위해 만든 큰 해설 문서입니다. 파일이 커서 모바일 속도 개선을 위해 별도 파일로 분리했습니다.</td>
+<td>사용자가 요청한 기존 설명 파일이므로 그대로 유지합니다.</td>
+<td>1.57 MB</td>
+</tr>
+<tr>
+<td><code>index.html</code></td>
+<td>메인 실행 파일</td>
+<td>GitHub Pages에서 web-test 주소로 들어갔을 때 가장 먼저 열리는 파일입니다. 상단 메뉴, 홈, 블로그, 일상기록, 메모, 가계부, 동기화, 통계, 소개, 메뉴설정 기능의 중심 파일입니다.</td>
+<td>항상 web-test 폴더 맨 위에 있어야 합니다. 이름을 바꾸면 사이트 첫 화면이 열리지 않을 수 있습니다.</td>
+<td>142.8 KB</td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="upload" class="card">
+  <h2>4. GitHub 업로드 방법</h2>
+  <ol class="checklist">
+    <li>다운로드한 ZIP 파일을 먼저 압축 해제합니다.</li>
+    <li>GitHub에서 <code>icookiekid.github.io</code> 저장소로 들어갑니다.</li>
+    <li><code>web-test</code> 폴더를 엽니다.</li>
+    <li><strong>index.html</strong> 파일을 업로드합니다.</li>
+    <li><strong>docs 폴더 전체</strong>도 같이 업로드합니다.</li>
+    <li>화면에서 <code>web-test/index.html</code>과 <code>web-test/docs/...</code> 파일들이 보이면 정상입니다.</li>
+  </ol>
+  <div class="ok">이번 구조에서는 <strong>index.html만 올리면 문서가 일부 열리지 않을 수 있습니다.</strong> 반드시 <strong>docs 폴더 전체</strong>를 함께 올려야 합니다.</div>
+</section>
+
+<section id="edit" class="card">
+  <h2>5. 나중에 수정할 때 기준</h2>
+  <h3>메인 화면, 메뉴, Firebase 저장 기능을 고칠 때</h3>
+  <p><code>index.html</code>을 수정합니다. 로그인, 동기화, 메모, 가계부, 블로그 저장 기능은 메인 파일에 있습니다.</p>
+  <h3>문서 내용만 고칠 때</h3>
+  <p><code>docs</code> 폴더 안의 해당 문서 파일만 수정하면 됩니다. 예를 들어 Firebase 설명만 고치려면 <code>docs/firebase_guide.html</code>을 수정하면 됩니다.</p>
+  <h3>새 문서를 추가할 때</h3>
+  <ol>
+    <li><code>docs/새문서파일.html</code>을 만듭니다.</li>
+    <li><code>index.html</code>의 문서 보관함 메뉴에 새 버튼을 추가합니다.</li>
+    <li>버튼 링크를 <code>docs/새문서파일.html</code>로 연결합니다.</li>
+  </ol>
+  <div class="code">&lt;button onclick="location.href='docs/새문서파일.html'"&gt;
+  새 문서 열기
+&lt;/button&gt;</div>
+</section>
+
+<section id="trouble" class="card">
+  <h2>6. 오류가 날 때 확인할 것</h2>
+  <h3>문서를 눌렀는데 404 또는 Not Found가 나올 때</h3>
+  <ul>
+    <li><code>docs</code> 폴더가 GitHub <code>web-test</code> 안에 있는지 확인합니다.</li>
+    <li>파일명이 링크와 정확히 같은지 확인합니다. 대문자/소문자도 다르게 취급될 수 있습니다.</li>
+    <li>파일을 <code>web-test/docs</code>가 아니라 저장소 맨 위나 다른 폴더에 올리지 않았는지 확인합니다.</li>
+  </ul>
+  <h3>수정했는데 예전 화면이 보일 때</h3>
+  <ul>
+    <li>PC에서는 <strong>Ctrl + F5</strong>로 강력 새로고침합니다.</li>
+    <li>모바일에서는 브라우저 탭을 닫고 다시 열거나, 방문 기록/캐시를 지운 뒤 확인합니다.</li>
+  </ul>
+  <h3>Firebase 데이터가 기존 블로그와 섞일까 걱정될 때</h3>
+  <p>이 web-test 전용 구조는 계속 아래 경로를 기준으로 사용합니다.</p>
+  <div class="path">users / 로그인한 사용자 UID / sites / web-test</div>
+</section>
+
+<div class="footer">최종 생성일자: 2026-05-14 11:41:56 KST / web-test 전용 / Ver19 파일 분리 구조 설명서</div>
+</main>
+</body>
+</html>
